@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অণুপাঠ (OnoPath) | সহজ পাঠে স্মার্ট প্রস্তুতি</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'logo.png' %}">
+</head>
+<body>
+
+    <!-- Hero Wrapper with Background Image -->
+    <div class="hero-container">
+        
+        <!-- Header / Navbar -->
+        <header class="navbar">
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logopng.png' %}" alt="অনুপাঠ লোগো" class="nav-logo">
+            </a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}" class="active">হোম</a></li>
+                    <li><a href="{% url 'study' %}">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
+                </ul>
+            </nav>
+
+            <div class="auth-buttons">
+                <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+                <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="hero-content">
+            <div class="hero-text">
+                <h1>সহজ পাঠে,<br><span class="highlight">স্মার্ট প্রস্তুতি</span></h1>
+                <p>এসএসসি ও এইচএসসি পরীক্ষার্থীদের জন্য অধ্যায়ভিত্তিক বাইট-সাইজ নোটস এবং তাৎক্ষণিক কুইজ টেস্ট নিয়ে অণুপাঠ তৈরি হয়েছে পড়াশোনাকে সহজ করতে।</p>
+                
+                <div class="cta-group">
+                    <a href="{% url 'auth' %}" class="btn-primary">অ্যাকাউন্ট তৈরি করুন →</a>
+                    <a href="{% url 'auth' %}" class="btn-secondary">লগইন করুন 👤</a>
+                </div>
+            </div>
+            <div class="hero-image" ><img src="{% static 'logopng.png' %}" alt="logopng.png"></div>
+        </main>
+
+        <!-- Compact Glassmorphic Cards (3 Cards) -->
+        <section class="features-grid">
+            <div class="feature-card">
+                <div class="card-icon">📖</div>
+                <div class="card-text">
+                    <h3>স্টাডি সেকশন</h3>
+                    <p>অধ্যায়ভিত্তিক সহজ নোটস ও শর্টকাট ব্যাখ্যার সংকলন।</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="card-icon">📋</div>
+                <div class="card-text">
+                    <h3>কুইজ সেকশন</h3>
+                    <p>নিয়মিত কুইজে অংশ নিয়ে নিজেকে দ্রুত যাচাই করুন।</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="card-icon">⚡</div>
+                <div class="card-text">
+                    <h3>স্মার্ট রিভিশন</h3>
+                    <p>পরীক্ষার আগের কম সময়ে সেরা ও নির্ভুল প্রস্তুতির গাইড।</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Bar -->
+        <footer class="footer-bar">
+            <div class="footer-quote">
+                <span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"
+            </div>
+            <div class="footer-links">
+                <a href="#">গোপনীয়তা নীতি</a>
+                <a href="#">ব্যবহারকারীর শর্তাবলী</a>
+                <a href="{% url 'about' %}">যোগাযোগ</a>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রবেশ / অ্যাকাউন্ট তৈরি | অণুপাঠ (OnoPath)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+    <div class="hero-container">
+        <!-- Header -->
+        <header class="navbar">
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logopng.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">হোম</a></li>
+                    <li><a href="{% url 'study' %}">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <a href="{% url 'login' %}" class="btn-login">লগইন করুন</a>
+                <a href="{% url 'signup' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+            </div>
+        </header>
+
+        <!-- Main Auth Container -->
+        <main class="quiz-play-container" style="max-width: 480px;">
+            <div class="quiz-play-card" style="padding: 30px 35px; text-align: left;">
+                
+                <!-- Tab Buttons (Login / Signup Switcher) -->
+                <div style="display: flex; border-bottom: 2px solid #E2E8F0; margin-bottom: 25px;">
+                    <button id="tab-login-btn" onclick="switchTab('login')" style="flex: 1;
+                     padding: 10px; background: none; border: none; border-bottom: 3px solid #10B981; 
+                     font-family: 'Hind Siliguri', sans-serif; font-weight: 700; font-size: 16px;
+                      color: #0F172A; cursor: pointer;"> লগইন </button>
+                    <button id="tab-signup-btn" onclick="switchTab('signup')" style="flex: 1;
+                     padding: 10px; background: none; border: none; border-bottom: 3px solid transparent;
+                      font-family: 'Hind Siliguri', sans-serif; font-weight: 600; font-size: 16px;
+                       color: #64748B; cursor: pointer;">নতুন অ্যাকাউন্ট</button>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <form id="login-form" action="{% url 'login' %}" method="POST" style="display: flex; 
+                flex-direction: column; gap: 16px;"> {% csrf_token %}
+                 <div>
+                        <label style="display: block; font-size: 14px; font-weight: 600;
+                         color: #334155; margin-bottom: 6px;">ইমেইল বা মোবাইল নম্বর</label>
+                        <input type="text" name="username" placeholder="example@mail.com বা 017xxxxxxxx" required style="width: 100%;
+                         padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; 
+                         font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
+                         margin-bottom: 6px;">পাসওয়ার্ড</label>
+                        <input type="password" name="password" placeholder="••••••••" required style="width: 100%;
+                         padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: inherit; 
+                         font-size: 14px; box-sizing: border-box; outline: none;">
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;
+                     margin-top: -4px;">
+                        <span style="font-size: 12px; color: #64748B;">পাসওয়ার্ড মনে নেই?</span>
+                        <a href="#" style="font-size: 12.5px; color: #059669; text-decoration: none;
+                         font-weight: 600;">SMS/OTP দিয়ে লগইন করুন</a>
+                    </div>
+
+                    <button type="submit" class="btn-card-action" style="width: 100%; padding: 12px; 
+                    font-size: 15px; text-align: center; justify-content: center; margin-top: 5px;">
+                        লগইন করুন 🚀 </button>
+                </form>
+
+                <!-- SIGNUP FORM (Initially Hidden) -->
+                <form id="signup-form" action="{% url 'signup' %}" method="POST" style="display: none;
+                 flex-direction: column; gap: 16px;"> {% csrf_token %}
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
+                         margin-bottom: 6px;">আপনার পূর্ণ নাম</label>
+                        <input type="text" name="full_name" placeholder="যেমন: মো: আবদুল্লাহ" required style="width: 100%; 
+                        padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px;
+                         font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
+                         margin-bottom: 6px;">ইমেইল এড্রেস</label>
+                        <input type="email" name="email" placeholder="example@gmail.com" required style="width: 100%;
+                         padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px;
+                          font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 600; color: #334155; 
+                        margin-bottom: 6px;">মোবাইল নম্বর (ওটিপির জন্য)</label>
+                        <input type="tel" name="phone" placeholder="017xxxxxxxx" required pattern="[0-9]{11}" style="width: 100%;
+                         padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: inherit;
+                          font-size: 14px; box-sizing: border-box; outline: none;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
+                         margin-bottom: 6px;">পাসওয়ার্ড তৈরি করুন</label>
+                        <input type="password" name="password" placeholder="কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড" required style="width: 100%;
+                         padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: inherit;
+                          font-size: 14px; box-sizing: border-box; outline: none;">
+                    </div>
+
+                    <button type="submit" class="btn-card-action" style="width: 100%; padding: 12px;
+                     font-size: 15px; text-align: center; justify-content: center; margin-top: 5px;">
+                        অ্যাকাউন্ট তৈরি করুন ✨
+                    </button>
+                </form>
+
+            </div>
+        </main>
+
+        <!-- Footer Bar -->
+        <footer class="footer-bar">
+            <div class="footer-quote"><span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
+        </footer>
+    </div>
+
+    <!-- JavaScript to toggle between Login & Signup Tabs -->
+    <script>
+         const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const loginBtn = document.getElementById('tab-login-btn');
+            const signupBtn = document.getElementById('tab-signup-btn');
+        function switchTab(tab) {
+
+            if (tab === 'login') {
+                loginForm.style.display = 'flex';
+                signupForm.style.display = 'none';
+                loginBtn.style.borderBottomColor = '#10B981';
+                loginBtn.style.color = '#0F172A';
+                loginBtn.style.fontWeight = '700';
+
+                signupBtn.style.borderBottomColor = 'transparent';
+                signupBtn.style.color = '#64748B';
+                signupBtn.style.fontWeight = '600';
+            }
+             else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'flex';
+                signupBtn.style.borderBottomColor = '#10B981';
+                signupBtn.style.color = '#0F172A';
+                signupBtn.style.fontWeight = '700';
+
+                loginBtn.style.borderBottomColor = 'transparent';
+                loginBtn.style.color = '#64748B';
+                loginBtn.style.fontWeight = '600';
+            }
+        }
+    </script>
+
+</body>
+</html>

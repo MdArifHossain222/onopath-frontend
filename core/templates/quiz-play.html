@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পদার্থবিজ্ঞান কুইজ প্লে | অণুপাঠ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- MathJax (LaTeX Display Only) -->
+    <script>
+        MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+    <div class="hero-container">
+        <!-- Header / Navbar -->
+        <header class="navbar">
+            <a href="index.html" class="logo-box">
+                <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">হোম</a></li>
+                    <li><a href="study.html">স্টাডি</a></li>
+                    <li><a href="quiz.html" class="active">কুইজ</a></li>
+                    <li><a href="about.html">আমাদের কথা</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <a href="auth.html" class="btn-login">লগইন করুন</a>
+                <a href="auth.html" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="quiz-play-container">
+            <div class="quiz-play-card">
+                
+                <!-- Top Info Bar -->
+                <div class="quiz-card-header">
+                    <span class="quiz-subject-tag">⚡ পদার্থবিজ্ঞান: গতি ও বল</span>
+                    <span class="quiz-step-count">প্রশ্ন ১ / ৫</span>
+                </div>
+
+                <!-- Question Text -->
+                <h3 class="quiz-question">
+                    ১. একটি বস্তু স্থির অবস্থান থেকে $2\text{ m/s}^2$ সুষম ত্বরণে চলতে শুরু করলে $4\text{ s}$ পর এর বেগ কত হবে?
+                </h3>
+
+                <!-- Options List (Vertical Stack) -->
+                <div class="quiz-options-grid">
+                    <button class="quiz-opt-btn">ক) $4\text{ m/s}$</button>
+                    <button class="quiz-opt-btn selected-opt">খ) $8\text{ m/s}$</button>
+                    <button class="quiz-opt-btn">গ) $16\text{ m/s}$</button>
+                    <button class="quiz-opt-btn">ঘ) $2\text{ m/s}$</button>
+                </div>
+
+                <!-- Action Button -->
+                <div class="quiz-footer-action">
+                    <button class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
+                </div>
+
+                <!-- Explanation Section (Static Preview) -->
+                <div class="quiz-explanation">
+                    <h4>💡 ব্যাখ্যা:</h4>
+                    <p>আমরা জানি, $v = u + at$।<br>
+                    এখানে আদিবেগ $u = 0$, ত্বরণ $a = 2\text{ m/s}^2$ এবং সময় $t = 4\text{ s}$।<br>
+                    সুতরাং, $v = 0 + (2 \times 4) = 8\text{ m/s}$।</p>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Footer Bar -->
+        <footer class="footer-bar">
+            <div class="footer-quote"><span>🌱</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
+        </footer>
+    </div>
+
+</body>
+</html>
