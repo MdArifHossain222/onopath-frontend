@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>অধ্যায় ১: ভৌত রাশি ও পরিমাপ | অণুপাঠ (OnoPath)</title>
+    <title>অধ্যায় {{ chapter.chapter_number }}: {{ chapter.title }} | অণুপাঠ (OnoPath)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,20 +24,25 @@
     <div class="hero-container">
         <!-- Header -->
         <header class="navbar">
-            <a href="index.html" class="logo-box">
+            <a href="{% url 'home' %}" class="logo-box">
                 <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="index.html">হোম</a></li>
-                    <li><a href="study.html" class="active">স্টাডি</a></li>
-                    <li><a href="quiz.html">কুইজ</a></li>
-                    <li><a href="about.html">আমাদের কথা</a></li>
+                    <li><a href="{% url 'home' %}">হোম</a></li>
+                    <li><a href="{% url 'study' %}" class="active">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
             <div class="auth-buttons">
-                <a href="auth.html" class="btn-login">লগইন করুন</a>
-                <a href="auth.html" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="btn-login">👤 প্রোফাইল</a>
+                    <a href="{% url 'logout' %}" class="btn-signup">লগআউট</a>
+                {% else %}
+                    <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+                    <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% endif %}
             </div>
         </header>
 
@@ -47,64 +52,42 @@
                 
                 <!-- Navigation Top Bar -->
                 <div class="quiz-card-header" style="border-bottom: 1px solid #E2E8F0; padding-bottom: 12px; margin-bottom: 20px;">
-                    <span class="quiz-subject-tag">⚛️ পদার্থবিজ্ঞান • অধ্যায় ১</span>
-                    <a href="study-chapters.html" class="btn-secondary-link">← অধ্যায় তালিকায় ফিরুন</a>
+                    <span class="quiz-subject-tag">⚛️ {{ chapter.subject.name }} • অধ্যায় {{ chapter.chapter_number }}</span>
+                    <a href="{% url 'study_chapters' chapter.subject.id %}" class="btn-secondary-link">← অধ্যায় তালিকায় ফিরুন</a>
                 </div>
 
                 <!-- Reading Header -->
                 <h1 style="font-size: 24px; color: #0F172A; font-weight: 700; margin-bottom: 10px;">
-                    ভৌত রাশি ও পরিমাপ (Physical Quantities and Measurement)
+                    অধ্যায় {{ chapter.chapter_number }}: {{ chapter.title }}
                 </h1>
                 
                 <div style="font-size: 13px; color: #64748B; margin-bottom: 25px; display: flex; gap: 15px;">
-                    <span>⏱️ পড়ার সময়: ৫ মিনিট</span>
-                    <span>📖 টপিক: পরিমাপ, একক ও মাত্রা</span>
+                    <span>⏱️ পড়ার সময়: ৫ মিনিট</span>
+                    <span>📖 টপিক: বিস্তারিত নোট ও সূত্রাবলী</span>
                 </div>
 
-                <!-- Article Body Content -->
+                <!-- Article Body Content (Dynamic Lessons Loop) -->
                 <div style="font-size: 15.5px; color: #334155; line-height: 1.8; display: flex; flex-direction: column; gap: 18px;">
                     
-                    <p>
-                        এই ভৌত জগতে যা কিছু পরিমাপ করা যায়, তাকেই আমরা <strong>রাশি (Quantity)</strong> বলি। যেমন— দৈর্ঘ্য, ভর, সময়, তাপমাত্রা ইত্যাদি পরিমাপ করা যায়, তাই এগুলো রাশি।
-                    </p>
-
-                    <h3 style="font-size: 18px; color: #0F172A; margin-top: 10px;">১. মৌলিক ও লব্ধ রাশি</h3>
-                    <p>
-                        রাশি প্রধানত দুই প্রকার:
-                    </p>
-                    <ul style="padding-left: 20px; margin-top: -5px;">
-                        <li><strong>মৌলিক রাশি:</strong> যেসকল রাশি স্বাধীন বা নিরপেক্ষ, অর্থাৎ অন্য কোনো রাশির ওপর নির্ভর করে না। যেমন: দৈর্ঘ্য, ভর, সময়। (এসআই পদ্ধতিতে মৌলিক রাশি মোট ৭টি)।</li>
-                        <li><strong>লব্ধ রাশি:</strong> যেসকল রাশি মৌলিক রাশির ওপর নির্ভর করে বা একাধিক মৌলিক রাশির গুণফল/ভাগফল থেকে লাভ করা যায়। যেমন: বেগ, বল, কাজ, ক্ষমতা।</li>
-                    </ul>
-
-                    <!-- Formula Box Example -->
-                    <div style="background: rgba(16, 185, 129, 0.08); border-left: 4px solid #10B981; padding: 15px 20px; border-radius: 6px; margin: 10px 0;">
-                        <h4 style="color: #047857; margin-bottom: 5px; font-size: 15px;">💡 গুরুত্বপূর্ণ গাণিতিক মাত্রা ও সূত্র:</h4>
-                        <p style="margin: 0; font-size: 15px;">
-                            বলের মাত্রা নির্ধারণ: 
-                            $$[F] = [M] \times [a] = [M] \times [L T^{-2}] = [M L T^{-2}]$$
-                        </p>
-                    </div>
-
-                    <h3 style="font-size: 18px; color: #0F172A; margin-top: 10px;">২. পরোক্ষ পরিমাপ ও স্লাইড ক্যালিফার্স</h3>
-                    <p>
-                        সূক্ষ্ম পরিমাপের জন্য সাধারণ স্কেলের চেয়ে স্লাইড ক্যালিফার্স বা স্ক্রু গজ ব্যবহার করা হয়। স্লাইড ক্যালিফার্সের সাহায্যে কোনো বস্তুর দৈর্ঘ্য পরিমাপের সূত্র:
-                    </p>
-                    
-                    <p style="background: rgba(255,255,255,0.7); padding: 12px; border-radius: 8px; border: 1px solid #CBD5E1; text-align: center;">
-                        $$L = M + (V \times VC)$$
-                    </p>
-                    
-                    <p>
-                        এখানে, $M$ = প্রধান স্কেল পাঠ, $V$ = ভার্নিয়ার সমপাতন, এবং $VC$ = ভার্নিয়ার ধ্রুবক (Vernier Constant)।
-                    </p>
+                    {% for lesson in lessons %}
+                        <div style="margin-bottom: 25px;">
+                            <h3 style="font-size: 18px; color: #0F172A; margin-top: 10px; margin-bottom: 8px;">{{ lesson.title }}</h3>
+                            <div style="background: rgba(255,255,255,0.85); padding: 18px 20px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                                {{ lesson.content|safe|linebreaks }}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div style="text-align: center; padding: 40px; color: #64748B;">
+                            <p>এই অধ্যায়ের বিস্তারিত লেসন বা নোট এখনো প্রস্তুত করা হয়নি। খুব শীঘ্রই যুক্ত করা হবে!</p>
+                        </div>
+                    {% endfor %}
 
                 </div>
 
                 <!-- Bottom Navigation / Quick Test -->
                 <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <a href="study-chapters.html" class="btn-secondary-link">← পূর্ববর্তী অধ্যায়</a>
-                    <a href="quiz-play.html" class="btn-card-action" style="text-decoration: none;">এই অধ্যায়ের কুইজ দিন 🎯</a>
+                    <a href="{% url 'study_chapters' chapter.subject.id %}" class="btn-secondary-link">← অধ্যায় তালিকায় ফিরুন</a>
+                    <a href="{% url 'quiz' %}" class="btn-card-action" style="text-decoration: none;">এই অধ্যায়ের কুইজ দিন 🎯</a>
                 </div>
 
             </div>

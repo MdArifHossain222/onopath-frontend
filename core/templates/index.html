@@ -32,10 +32,15 @@
                 </ul>
             </nav>
 
-            <div class="auth-buttons">
-                <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
-                <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
-            </div>
+           <div class="auth-buttons">
+    {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="btn-login">👤 প্রোফাইল</a>
+        <a href="{% url 'logout' %}" class="btn-signup">লগআউট</a>
+    {% else %}
+        <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+        <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+    {% endif %}
+</div>
         </header>
 
         <!-- Main Content Area -->

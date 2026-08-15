@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -7,27 +8,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
     <div class="hero-container">
         <!-- Header / Navbar -->
         <header class="navbar">
-            <a href="index.html" class="logo-box">
-                <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="index.html">হোম</a></li>
-                    <li><a href="study.html">স্টাডি</a></li>
-                    <li><a href="quiz.html" class="active">কুইজ</a></li>
-                    <li><a href="about.html">আমাদের কথা</a></li>
+                    <li><a href="{% url 'home' %}">হোম</a></li>
+                    <li><a href="{% url 'study' %}">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz' %}" class="active">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
             <div class="auth-buttons">
-                <a href="auth.html" class="btn-login">লগইন করুন</a>
-                <a href="auth.html" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="btn-login">👤 প্রোফাইল</a>
+                    <a href="{% url 'logout' %}" class="btn-signup">লগআউট</a>
+                {% else %}
+                    <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+                    <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% endif %}
             </div>
         </header>
 
@@ -35,49 +41,30 @@
         <main class="page-content">
             <div class="page-title">
                 <h2>অনলাইন কুইজ টেস্ট 🎯</h2>
-                <p>বিষয় সিলেক্ট করে ডেমো কুইজে অংশ নিন এবং প্রতিটি প্রশ্নের নির্ভুল ব্যাখ্যা দেখে নিজেকে যাচাই করুন।</p>
+                <p>বিষয় সিলেক্ট করে ডেমো কুইজে অংশ নিন এবং প্রতিটি প্রশ্নের নির্ভুল ব্যাখ্যা দেখে নিজেকে যাচাই করুন।</p>
             </div>
 
             <div class="subject-grid">
-                <!-- Physics Quiz -->
+                {% for q in quizzes %}
+                <div class="subject-card">
+                    <div class="card-header-inline">
+                        <span class="subj-icon">⚡</span>
+                        <h3>{{ q.title }}</h3>
+                    </div>
+                    <p>{{ q.description|default:"এই কুইজে অংশ নিয়ে আপনার প্রস্তুতি যাচাই করুন।" }}</p>
+                    <a href="{% url 'quiz_play' q.id %}" class="btn-card-action">কুইজ শুরু করুন 🚀</a>
+                </div>
+                {% empty %}
+                <!-- স্ট্যাটিক ব্যাকআপ বা ডিফল্ট কার্ড যদি ডাটাবেজে কুইজ না থাকে -->
                 <div class="subject-card">
                     <div class="card-header-inline">
                         <span class="subj-icon">⚡</span>
                         <h3>পদার্থবিজ্ঞান কুইজ</h3>
                     </div>
                     <p>গতি ও বল অধ্যায়ের উপর ৫টি ইনস্ট্যান্ট কুইজ টেস্ট।</p>
-                    <a href="quiz-play.html" class="btn-card-action">কুইজ শুরু করুন 🚀</a>
+                    <a href="{% url 'quiz' %}" class="btn-card-action">খুব শীঘ্রই আসছে 🚀</a>
                 </div>
-
-                <!-- Chemistry Quiz -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">🧪</span>
-                        <h3>রসায়ন কুইজ</h3>
-                    </div>
-                    <p>রাসায়নিক বন্ধন ও বিক্রিয়া থেকে বাছাইকৃত কুইজ।</p>
-                    <a href="quiz-play.html" class="btn-card-action">কুইজ শুরু করুন 🚀</a>
-                </div>
-
-                <!-- Higher Math Quiz -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">🔢</span>
-                        <h3>উচ্চতর গণিত কুইজ</h3>
-                    </div>
-                    <p>সূচক, লগারিদম ও ত্রিকোণমিতির শর্টকাট টেস্ট।</p>
-                    <a href="quiz-play.html" class="btn-card-action">কুইজ শুরু করুন 🚀</a>
-                </div>
-
-                <!-- General Science -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">🌐</span>
-                        <h3>সাধারণ বিজ্ঞান</h3>
-                    </div>
-                    <p>দৈনন্দিন বিজ্ঞান ও সাধারণ জ্ঞানের কুইজ মডিউল।</p>
-                    <a href="quiz-play.html" class="btn-card-action">কুইজ শুরু করুন 🚀</a>
-                </div>
+                {% endfor %}
             </div>
         </main>
 
@@ -85,7 +72,7 @@
         <footer class="footer-bar">
             <div class="footer-quote"><span>🌱</span> "জ্ঞানই শক্তি, সচেতনতাই পরিবর্তন"</div>
             <div class="footer-links">
-                <a href="#">গোপনীয়তা নীতি</a>
+                <a href="#">গোপনীয়তা নীতি</a>
                 <a href="#">ব্যবহারকারীর শর্তাবলী</a>
             </div>
         </footer>

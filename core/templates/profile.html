@@ -8,18 +8,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-       <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
     <div class="hero-container">
         <!-- Header -->
         <header class="navbar">
-           <!-- ১৭ ও ১৮ নম্বর লাইন পরিবর্তন -->
-     <a href="{% url 'home' %}" class="logo-box">
-    <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
-        </a>
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
+            </a>
             <nav>
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">হোম</a></li>
@@ -29,8 +27,7 @@
                 </ul>
             </nav>
             <div class="auth-buttons">
-                <a href="profile.html" class="btn-login" style="background: rgba(16, 185, 129, 0.15);
-                 border: 1px solid #10B981;">👤 আমার প্রোফাইল</a>
+                <a href="{% url 'profile' %}" class="btn-login" style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981;">👤 আমার প্রোফাইল</a>
                 <a href="{% url 'logout' %}" class="btn-signup" style="background: #EF4444;">লগআউট</a>
             </div>
         </header>
@@ -39,91 +36,86 @@
         <main class="quiz-play-container" style="max-width: 850px;">
             <div class="quiz-play-card" style="padding: 30px 35px; text-align: left;">
                 
-            <!-- Profile Header Card -->
-<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; 
-padding-bottom: 20px; border-bottom: 1px solid #E5E7EB;">
-    
-    <!-- বামের অংশ: অবতার + নাম-ইমেইল -->
-    <div style="display: flex; align-items: center; gap: 18px;">
-        
-        <!-- Profile Avatar -->
-        <div id="avatar-box" style="width: 70px; height: 70px; border-radius: 50%; 
-        background: linear-gradient(135deg, #10B981, #059669); color: white; display: flex;
-         align-items: center; justify-content: center; font-size: 26px; font-weight: bold; cursor: pointer; 
-         position: relative; overflow: hidden;" onclick="triggerUpload()">
-            <!-- ডিফল্ট লেখা (ছবি না থাকলে দেখাবে) -->
-            <!-- লাইন ৫২-তে পরিবর্তন -->
-           <span id="avatar-text">{{ request.user.username|slice:":1"|upper }}</span>
-            
-            <!-- আপলোড করা ছবি এখানে দেখাবে -->
-            <img id="avatar-img" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;
-             display: none;">
+                <!-- Profile Header Card -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #E5E7EB;">
+                    
+                    <!-- বামের অংশ: অবতার + নাম-ইমেইল -->
+                    <div style="display: flex; align-items: center; gap: 18px;">
+                        
+                        <!-- Profile Avatar Form -->
+                        <form id="avatar-form" method="POST" action="{% url 'profile' %}" enctype="multipart/form-data" style="margin: 0;">
+                            {% csrf_token %}
+                            <div id="avatar-box" style="width: 70px; height: 70px; border-radius: 50%; 
+                            background: linear-gradient(135deg, #10B981, #059669); color: white; display: flex;
+                            align-items: center; justify-content: center; font-size: 26px; font-weight: bold; cursor: pointer; 
+                            position: relative; overflow: hidden;" onclick="triggerUpload()">
+                                
+                                {% if request.user.studentprofile.avatar %}
+                                    <!-- ডাটাবেজে আগে থেকে ছবি সেভ থাকলে দেখাবে -->
+                                    <img id="avatar-img" src="{{ request.user.studentprofile.avatar.url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                    <!-- ছবি না থাকলে ইউজারনেমের ১ম অক্ষর দেখাবে -->
+                                    <span id="avatar-text">{{ request.user.username|slice:":1"|upper }}</span>
+                                    <img id="avatar-img" src="" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                {% endif %}
 
-            <!-- হিডেন ফাইল ইনপুট -->
-            <input type="file" id="image-input" accept="image/*" style="display: none;
-            " onchange="previewImage(event)">
-        </div>
+                            </div>
+                            <!-- হিডেন ফাইল ইনপুট -->
+                            <input type="file" name="avatar" id="image-input" accept="image/*" style="display: none;" onchange="submitAvatarForm()">
+                        </form>
 
-      <!-- ইউজারের নাম ও তথ্য -->
-<div>
-    <h2 style="font-size: 22px; color: #0F172A; margin-bottom: 4px;">
-        {{ request.user.get_full_name|default:request.user.username }}
-    </h2>
-    <p style="font-size: 13.5px; color: #64748B; margin-bottom: 2px;">
-        {{ request.user.email }} 
-        {% if request.user.studentprofile.phone_number %}
-            | {{ request.user.studentprofile.phone_number }}
-        {% endif %}
-    </p>
-    <span style="display: inline-block; background: #E0F2FE; color: #0369A1; font-size: 12px; font-weight: 600;
-     padding: 2px 10px; border-radius: 12px; margin-top: 4px;">
-        মাধ্যমিক শিক্ষার্থী (SSC)
-    </span>
-</div>
+                        <!-- ইউজারের নাম ও তথ্য -->
+                        <div>
+                            <h2 style="font-size: 22px; color: #0F172A; margin-bottom: 4px;">
+                                {{ request.user.get_full_name|default:request.user.username }}
+                            </h2>
+                            <p style="font-size: 13.5px; color: #64748B; margin-bottom: 2px;">
+                                {{ request.user.email }} 
+                                {% if request.user.studentprofile.phone_number %}
+                                    | {{ request.user.studentprofile.phone_number }}
+                                {% endif %}
+                            </p>
+                            <span style="display: inline-block; background: #E0F2FE; color: #0369A1; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 12px; margin-top: 4px;">
+                                মাধ্যমিক/উচ্চ শিক্ষার্থী (SSC/HSC)
+                            </span>
+                        </div>
 
-    </div>
+                    </div>
 
-    <!-- ডানের অংশ: এডিট বাটন -->
-    <div>
-        <button style="padding: 9px 16px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px;
-         cursor: pointer; font-weight: 500;">⚙ তথ্য এডিট করুন</button>
-    </div>
+                    <!-- ডানের অংশ: এডিট বাটন -->
+                    <div>
+                        <button onclick="openEditModal()" style="padding: 9px 16px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; cursor: pointer; font-weight: 500;">⚙ তথ্য এডিট করুন</button>
+                    </div>
 
-</div>
                 </div>
 
                 <!-- Progress & Overview Stats -->
-                <h3 style="font-size: 17px; color: #0F172A; margin-top: 25px; margin-bottom: 15px;
-                ">আপনার পড়াশোনার অগ্রগতি 📊</h3>
+                <h3 style="font-size: 17px; color: #0F172A; margin-top: 25px; margin-bottom: 15px;">আপনার পড়াশোনার অগ্রগতি 📊</h3>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                 gap: 15px; margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px;">
                     <!-- Stat 1 -->
-                    <div style="background: rgba(255, 255, 255, 0.9); border: 1px solid #CBD5E1;
-                     border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 15px;">
+                    <div style="background: rgba(255, 255, 255, 0.9); border: 1px solid #CBD5E1; border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 15px;">
                         <span style="font-size: 32px;">📖</span>
                         <div>
-                            <h4 style="font-size: 20px; color: #0F172A; font-weight: 700;">১২ টি</h4>
-                            <p style="font-size: 13px; color: #64748B;">অধ্যায় পড়া সম্পন্ন</p>
+                            <h4 style="font-size: 20px; color: #0F172A; font-weight: 700;">{{ profile.chapters_completed }}টি</h4>
+                            <p style="font-size: 13px; color: #64748B;">অধ্যায় পড়া সম্পন্ন</p>
                         </div>
                     </div>
 
                     <!-- Stat 2 -->
-                    <div style="background: rgba(255, 255, 255, 0.9); border: 1px solid #CBD5E1;
-                     border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 15px;">
+                    <div style="background: rgba(255, 255, 255, 0.9); border: 1px solid #CBD5E1; border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 15px;">
                         <span style="font-size: 32px;">🎯</span>
                         <div>
-                            <h4 style="font-size: 20px; color: #0F172A; font-weight: 700;">৮ টি</h4>
+                            <h4 style="font-size: 20px; color: #0F172A; font-weight: 700;">{{ profile.quizzes_completed }}টি</h4>
                             <p style="font-size: 13px; color: #64748B;">কুইজ সম্পন্ন</p>
                         </div>
                     </div>
 
                     <!-- Stat 3 -->
-                    <div style="background: rgba(255, 255, 255, 0.9); border: 1px solid #CBD5E1;
-                     border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 15px;">
+                    <div style="background: rgba(255, 255, 255, 0.9); border: 1px solid #CBD5E1; border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 15px;">
                         <span style="font-size: 32px;">🏆</span>
                         <div>
-                            <h4 style="font-size: 20px; color: #10B981; font-weight: 700;">৩৫০ পয়েন্ট</h4>
+                            <h4 style="font-size: 20px; color: #10B981; font-weight: 700;">{{ profile.total_points }} পয়েন্ট</h4>
                             <p style="font-size: 13px; color: #64748B;">মোট অর্জিত স্কোর</p>
                         </div>
                     </div>
@@ -134,32 +126,26 @@ padding-bottom: 20px; border-bottom: 1px solid #E5E7EB;">
                 
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     
-                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px;
-                     padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
-                      font-size: 14px;">
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span>⚛️</span>
                             <div>
-                                <span style="font-weight: 600; color: #0F172A;">
-                                    পদার্থবিজ্ঞান • অধ্যায় ১: ভৌত রাশি ও পরিমাপ</span>
+                                <span style="font-weight: 600; color: #0F172A;">পদার্থবিজ্ঞান • অধ্যায় ১: ভৌত রাশি ও পরিমাপ</span>
                                 <div style="font-size: 12px; color: #64748B;">কুইজ স্কোর: ৪/৪ (১০০%)</div>
                             </div>
                         </div>
-                        <a href="quiz-play.html" class="btn-card-action" style="padding: 6px 12px; font-size: 12.5px;
-                        ">পুনরায় কুইজ দিন</a>
+                        <a href="{% url 'quiz' %}" class="btn-card-action" style="padding: 6px 12px; font-size: 12.5px;">পুনরায় কুইজ দিন</a>
                     </div>
 
-                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px;
-                     display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span>🧪</span>
                             <div>
-                                <span style="font-weight: 600; color: #0F172A;">রসায়ন • অধ্যায় ৩: পদার্থের গঠন</span>
-                                <div style="font-size: 12px; color: #64748B;">নোট পড়া শেষ হয়েছে</div>
+                                <span style="font-weight: 600; color: #0F172A;">রসায়ন • অধ্যায় ৩: পদার্থের গঠন</span>
+                                <div style="font-size: 12px; color: #64748B;">নোট পড়া শেষ হয়েছে</div>
                             </div>
                         </div>
-                        <a href="study-read.html" class="btn-card-action" style="padding: 6px 12px; font-size: 12.5px;
-                        ">পড়া চালিয়ে যান</a>
+                        <a href="{% url 'study' %}" class="btn-card-action" style="padding: 6px 12px; font-size: 12.5px;">পড়া চালিয়ে যান</a>
                     </div>
 
                 </div>
@@ -172,30 +158,59 @@ padding-bottom: 20px; border-bottom: 1px solid #E5E7EB;">
             <div class="footer-quote"><span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
         </footer>
     </div>
-    <script>
-// ১. গোল অবতারে ক্লিক করলে ফাইল ইনপুট ক্লিক হবে
-function triggerUpload() {
-    document.getElementById('image-input').click();
-}
 
-// ২. ইউজার ছবি সিলেক্ট করলে সেটাকে প্রিভিউ করবে
-function previewImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            const img = document.getElementById('avatar-img');
-            const text = document.getElementById('avatar-text');
-            
-            img.src = e.target.result; // ছবির লিংক বসানো
-            img.style.display = 'block'; // ছবি দৃশ্যমান করা
-            text.style.display = 'none'; // "আ" লেখাটি লুকিয়ে ফেলা
-        }
-        
-        reader.readAsDataURL(file); // ফাইল পড়ার নির্দেশ
+    <script>
+    // ১. গোল অবতারে ক্লিক করলে ফাইল ইনপুট ট্রিপ হবে
+    function triggerUpload() {
+        document.getElementById('image-input').click();
     }
-}
+
+    // ২. ছবি সিলেক্ট হওয়ামাত্র ফর্ম সাবমিট হবে (Django views-এ ডাটা সেভ করার জন্য)
+    function submitAvatarForm() {
+        const input = document.getElementById('image-input');
+        if (input.files && input.files[0]) {
+            document.getElementById('avatar-form').submit();
+        }
+    }
+    </script>
+    <!-- Edit Profile Modal -->
+<div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <h3 style="margin-top: 0; color: #333;">তথ্য এডিট করুন</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">নাম:</label>
+                {{ u_form.first_name }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">ইমেইল:</label>
+                {{ u_form.email }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">শিক্ষাপ্রতিষ্ঠান:</label>
+                {{ p_form.institution }}
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; margin-bottom:5px;">ফোন নম্বর:</label>
+                {{ p_form.phone_number }}
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" onclick="closeEditModal()" style="padding: 8px 16px; background: #ccc; border: none; border-radius: 6px; cursor: pointer;">বাতিল</button>
+                <button type="submit" style="padding: 8px 16px; background: #2b7fff; color: white; border: none; border-radius: 6px; cursor: pointer;">সেভ করুন</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal() {
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
 </script>
 </body>
 </html>

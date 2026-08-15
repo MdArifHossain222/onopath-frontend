@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -7,77 +8,58 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
     <div class="hero-container">
         <!-- Header -->
         <header class="navbar">
-            <a href="index.html" class="logo-box">
-                <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="index.html">হোম</a></li>
-                    <li><a href="study.html" class="active">স্টাডি</a></li>
-                    <li><a href="quiz.html">কুইজ</a></li>
-                    <li><a href="about.html">আমাদের কথা</a></li>
+                    <li><a href="{% url 'home' %}">হোম</a></li>
+                    <li><a href="{% url 'study' %}" class="active">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
             <div class="auth-buttons">
-                <a href="auth.html" class="btn-login">লগইন করুন</a>
-                <a href="auth.html" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="btn-login">👤 প্রোফাইল</a>
+                    <a href="{% url 'logout' %}" class="btn-signup">লগআউট</a>
+                {% else %}
+                    <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+                    <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% endif %}
             </div>
         </header>
 
         <!-- Main Page Area -->
         <main class="page-content">
             <div class="page-title">
-                <h2>পাঠ্যবিষয় ও নোটস সংকলন 📚</h2>
-                <p>আপনার কাঙ্ক্ষিত বিষয়টি নির্বাচন করে অধ্যায়ভিত্তিক নোট ও সহজে বোঝার কনসেপ্ট পড়া শুরু করুন।</p>
+                <h2>পাঠ্যবিষয় ও নোটস সংকলন 📚</h2>
+                <p>আপনার কাঙ্ক্ষিত বিষয়টি নির্বাচন করে অধ্যায়ভিত্তিক নোট ও সহজে বোঝার কনসেপ্ট পড়া শুরু করুন।</p>
             </div>
 
             <div class="subject-grid">
-                <!-- Physics -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">⚛️</span>
-                        <h3>পদার্থবিজ্ঞান</h3>
-                    </div>
-                    <p>গতি, বল, কাজ-ক্ষমতা-শক্তি ও আলোকবিদ্যার সহজ ব্যাখ্যাসহ বাইট-সাইজ নোটস।</p>
-                    <a href="study-chapters.html" class="btn-card-action">অধ্যায়সমূহ দেখুন 📖</a>
-                </div>
-
-                <!-- Chemistry -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">🧪</span>
-                        <h3>রসায়ন</h3>
-                    </div>
-                    <p>পর্যায় সারণি, রাসায়নিক বন্ধন ও বিক্রিয়া সহজে মনে রাখার শর্টকাট কৌশল।</p>
-                    <a href="study-chapters.html" class="btn-card-action">অধ্যায়সমূহ দেখুন 📖</a>
-                </div>
-
-                <!-- Higher Math -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">📐</span>
-                        <h3>উচ্চতর গণিত</h3>
-                    </div>
-                    <p>জ্যামিতি, স্থানাঙ্ক জ্যামিতি ও ত্রিকোণমিতির সমাধান ও সূত্র ব্যাংক।</p>
-                    <a href="study-chapters.html" class="btn-card-action">অধ্যায়সমূহ দেখুন 📖</a>
-                </div>
-
-                <!-- Biology -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">🧬</span>
-                        <h3>জীববিজ্ঞান</h3>
-                    </div>
-                    <p>কোষ তত্ত্ব, বংশগতি ও পরিবেশের বাস্তবধর্মী ভিজ্যুয়াল লেসন।</p>
-                    <a href="study-chapters.html" class="btn-card-action">অধ্যায়সমূহ দেখুন 📖</a>
-                </div>
+                {% if subjects %}
+                    {% for subject in subjects %}
+                        <!-- Dynamic Subject Card -->
+                        <div class="subject-card">
+                            <div class="card-header-inline">
+                                <span class="subj-icon">{{ subject.icon }}</span>
+                                <h3>{{ subject.name }}</h3>
+                            </div>
+                            <p>{{ subject.description }}</p>
+                            <a href="{% url 'study_chapters' subject.id %}" class="btn-card-action">অধ্যায়সমূহ দেখুন 📖</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="text-align: center; color: #64748B;">বর্তমানে কোনো বিষয় যুক্ত করা নেই। এডমিন প্যানেল থেকে বিষয় যুক্ত করুন।</p>
+                {% endif %}
             </div>
         </main>
 

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -7,27 +8,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
     <div class="hero-container">
         <!-- Header -->
         <header class="navbar">
-            <a href="index.html" class="logo-box">
-                <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="index.html">হোম</a></li>
-                    <li><a href="study.html">স্টাডি</a></li>
-                    <li><a href="quiz.html">কুইজ</a></li>
-                    <li><a href="about.html" style="color: #10B981; font-weight: 700;">আমাদের কথা</a></li>
+                    <li><a href="{% url 'home' %}">হোম</a></li>
+                    <li><a href="{% url 'study' %}">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}" style="color: #10B981; font-weight: 700;">আমাদের কথা</a></li>
                 </ul>
             </nav>
             <div class="auth-buttons">
-                <a href="auth.html" class="btn-login">লগইন করুন</a>
-                <a href="auth.html" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="btn-login">👤 প্রোফাইল</a>
+                    <a href="{% url 'logout' %}" class="btn-signup">লগআউট</a>
+                {% else %}
+                    <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+                    <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% endif %}
             </div>
         </header>
 
@@ -47,43 +53,81 @@
                         <span>🚀</span> আমাদের মূল ভাবনা
                     </h3>
                     <p style="font-size: 14.5px; color: #334155; line-height: 1.7;">
-                        <strong>অণুপাঠ (OnoPath)</strong> শিক্ষার্থীদের জন্য তৈরি একটি আধুনিক ও উন্মুক্ত শিক্ষামূলক প্ল্যাটফর্ম। শিক্ষার্থীদের কঠিন বিষয়গুলোকে সহজ ও সাবলীল ভাষায় উপস্থাপন করা এবং অধ্যায়ভিত্তিক অনুশীলনের মাধ্যমে আত্মবিশ্বাস বৃদ্ধি করাই আমাদের প্রধান লক্ষ্য। এখানে প্রতিটি পাঠ তৈরি করা হয়েছে সুনির্দিষ্ট ও নির্ভুল তথ্যের সমন্বয়ে।
+                        <strong>অণুপাঠ (OnoPath)</strong> শিক্ষার্থীদের জন্য তৈরি একটি আধুনিক ও উন্মুক্ত শিক্ষামূলক প্ল্যাটফর্ম। শিক্ষার্থীদের কঠিন বিষয়গুলোকে সহজ ও সাবলীল ভাষায় উপস্থাপন করা এবং অধ্যায়ভিত্তিক অনুশীলনের মাধ্যমে আত্মবিশ্বাস বৃদ্ধি করাই আমাদের প্রধান লক্ষ্য। এখানে প্রতিটি পাঠ তৈরি করা হয়েছে সুনির্দিষ্ট ও নির্ভুল তথ্যের সমন্বয়ে।
                     </p>
+                </div>
+
+                <!-- Founder & CEO Profile Section -->
+                <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                    <h3 style="font-size: 18px; color: #0F172A; margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
+                        <span>👤</span> প্রতিষ্ঠাতা ও সিইও-র কথা
+                    </h3>
+                    <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                        <!-- Founder Image Placeholder (Width: 120px, Height: 120px) -->
+                        <div style="flex-shrink: 0;">
+                            <img src="{% static 'founder.jpg' %}" alt="ফাউন্ডার ও সিইও" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #10B981; background: #CBD5E1;">
+                        </div>
+                        <div style="flex: 1; min-width: 250px;">
+                            <h4 style="font-size: 17px; color: #0F172A; margin-bottom: 2px;">[আপনার নাম]</h4>
+                            <p style="font-size: 13.5px; color: #10B981; font-weight: 600; margin-bottom: 10px;">ফাউন্ডার ও সিইও, অণুপাঠ</p>
+                            <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+                                [এখানে আপনার নিজের একাডেমিক ব্যাকগ্রাউন্ড, শিক্ষা নিয়ে আপনার দৃষ্টিভঙ্গি এবং শিক্ষার্থীদের উদ্দেশ্যে আপনার মূল বক্তব্যটি পরবর্তীতে লিখে যুক্ত করে দেবেন।]
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Key Features Grid -->
                 <h3 style="font-size: 18px; color: #0F172A; margin-bottom: 18px;">কেন অণুপাঠ ব্যবহার করবেন?</h3>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; margin-bottom: 30px;">
-                    
-                    <!-- Feature 1 -->
                     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px;">
                         <span style="font-size: 30px; display: block; margin-bottom: 10px;">📖</span>
                         <h4 style="font-size: 16px; color: #0F172A; font-weight: 700; margin-bottom: 6px;">সহজ পাঠ ও নোটস</h4>
-                        <p style="font-size: 13.5px; color: #64748B; line-height: 1.6;">জটিল বৈজ্ঞানিক তথ্য ও অধ্যায়গুলোকে সহজ ভাষায় সাজানো হয়েছে যেন যেকোনো শিক্ষার্থী সহজে বুঝতে পারে।</p>
+                        <p style="font-size: 13.5px; color: #64748B; line-height: 1.6;">জটিল বৈজ্ঞানিক তথ্য ও অধ্যায়গুলোকে সহজ ভাষায় সাজানো হয়েছে যেন যেকোনো শিক্ষার্থী সহজে বুঝতে পারে।</p>
                     </div>
 
-                    <!-- Feature 2 -->
                     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px;">
                         <span style="font-size: 30px; display: block; margin-bottom: 10px;">🎯</span>
                         <h4 style="font-size: 16px; color: #0F172A; font-weight: 700; margin-bottom: 6px;">ইন্টারেক্টিভ কুইজ</h4>
-                        <p style="font-size: 13.5px; color: #64748B; line-height: 1.6;">পড়া শেষ করার সাথে সাথেই অধ্যায়ভিত্তিক কুইজ দিয়ে নিজের দক্ষতা ও মেধা যাচাই করার সুযোগ।</p>
+                        <p style="font-size: 13.5px; color: #64748B; line-height: 1.6;">পড়া শেষ করার সাথে সাথেই অধ্যায়ভিত্তিক কুইজ দিয়ে নিজের দক্ষতা ও মেধা যাচাই করার সুযোগ।</p>
                     </div>
 
-                    <!-- Feature 3 -->
                     <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; padding: 20px;">
                         <span style="font-size: 30px; display: block; margin-bottom: 10px;">📊</span>
                         <h4 style="font-size: 16px; color: #0F172A; font-weight: 700; margin-bottom: 6px;">স্মার্ট ড্যাশবোর্ড</h4>
-                        <p style="font-size: 13.5px; color: #64748B; line-height: 1.6;">শিক্ষার্থীর নিজস্ব প্রোগ্রেস, মোট কুইজ স্কোর এবং পড়া শেষের হিসাব রাখার সুবিধাজনক ব্যবস্থা।</p>
+                        <p style="font-size: 13.5px; color: #64748B; line-height: 1.6;">শিক্ষার্থীর নিজস্ব প্রোগ্রেস, মোট কুইজ স্কোর এবং পড়া শেষের হিসাব রাখার সুবিধাজনক ব্যবস্থা।</p>
                     </div>
+                </div>
 
+                <!-- Dynamic Notice Board / Updates Section -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 18px; color: #0F172A; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <span>📢</span> বিশেষ বিজ্ঞপ্তি ও আপডেট
+                    </h3>
+                    
+                    {% if notices %}
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            {% for notice in notices %}
+                                <div style="background: #FFFFFF; border-left: 4px solid #10B981; border-top: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; border-bottom: 1px solid #E2E8F0; border-radius: 6px; padding: 15px;">
+                                    <h4 style="font-size: 15px; color: #0F172A; margin-bottom: 4px;">{{ notice.title }}</h4>
+                                    <span style="font-size: 12px; color: #94A3B8; display: block; margin-bottom: 8px;">{{ notice.created_at|date:"d F, Y" }}</span>
+                                    <p style="font-size: 13.5px; color: #475569; line-height: 1.6;">{{ notice.content }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="background: #F8FAFC; border: 1px dashed #CBD5E1; padding: 15px; border-radius: 8px; text-align: center;">
+                            <p style="font-size: 13.5px; color: #64748B;">বর্তমানে নতুন কোনো নোটিশ বা বিশেষ আপডেট নেই।</p>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <!-- Call to Action Banner -->
                 <div style="text-align: center; padding: 20px; background: #F8FAFC; border-radius: 10px; border: 1px solid #CBD5E1;">
                     <h4 style="font-size: 16px; color: #0F172A; margin-bottom: 8px;">আজই শুরু হোক আপনার শেখার সফর!</h4>
-                    <p style="font-size: 13.5px; color: #64748B; margin-bottom: 15px;">আপনার পড়াশোনাকে আরও এক ধাপ এগিয়ে নিতে আজই আমাদের সাথে যুক্ত হন।</p>
-                    <a href="study.html" class="btn-card-action" style="display: inline-block; padding: 10px 22px; font-size: 14px;">পড়াশোনা শুরু করুন ➔</a>
+                    <p style="font-size: 13.5px; color: #64748B; margin-bottom: 15px;">আপনার পড়াশোনাকে আরও এক ধাপ এগিয়ে নিতে আজই আমাদের সাথে যুক্ত হন।</p>
+                    <a href="{% url 'study' %}" class="btn-card-action" style="display: inline-block; padding: 10px 22px; font-size: 14px;">পড়াশোনা শুরু করুন ➔</a>
                 </div>
 
             </div>
