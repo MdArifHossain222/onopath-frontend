@@ -572,3 +572,25 @@ body, html {
         padding: 0 20px;
     }
 }
+/* কুইজ অপশন লেভেলের বেসিক ডিজাইন ও লেআউট */
+.quiz-options-grid label.quiz-opt-btn {
+    display: block;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* সাবমিট করার পর সঠিক উত্তর (সবুজ রঙ) */
+.quiz-options-grid label.quiz-opt-btn.correct-opt {
+    background-color: #d1e7dd !important;
+    border-color: #badbcc !important;
+    color: #0f5132 !important;
+    font-weight: bold !important;
+}
+
+/* সাবমিট করার পর ভুল উত্তর (লাল রঙ) */
+.quiz-options-grid label.quiz-opt-btn.wrong-opt {
+    background-color: #f8d7da !important;
+    border-color: #f5c2c7 !important;
+    color: #842029 !important;
+    font-weight: bold !important;
+}

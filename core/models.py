@@ -45,7 +45,7 @@ class Chapter(models.Model):
         return f"{self.subject.name} - {self.title}"
 
 
-# ৩. অধ্যায়ের পড়া/নotes (একই অধ্যায়ে একাধিক লেসন বা টপিকের জন্য ForeignKey ও title ব্যবহার করা হয়েছে)
+# ৩. অধ্যায়ের পড়া/নotes
 class Lesson(models.Model):
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=200, blank=True, null=True, verbose_name="লেসনের শিরোনাম")
@@ -85,3 +85,16 @@ class Option(models.Model):
     def __str__(self):
         status = "সঠিক" if self.is_correct else "ভুল"
         return f"{self.text} ({status})"
+
+
+# ৭. ইউজারের উত্তর সংরক্ষণের মডেল
+class UserAnswer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    is_correct = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - Question {self.question.id} ({'সঠিক' if self.is_correct else 'ভুল'})"

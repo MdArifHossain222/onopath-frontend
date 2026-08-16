@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import StudentProfile, Notice, Subject, Chapter, Lesson
+from .models import StudentProfile, Notice, Subject, Chapter, Lesson,Quiz, Question, Option
+from .models import UserAnswer
 
 # Profile-কে User-এর ভেতরে ইনলাইন হিসেবে দেখানোর জন্য
 class StudentProfileInline(admin.StackedInline):
@@ -21,3 +22,8 @@ admin.site.register(Notice)
 admin.site.register(Subject)
 admin.site.register(Chapter)
 admin.site.register(Lesson)
+# কুইজ মডেলগুলো এখানে রেজিস্টার করুন
+admin.site.register(Quiz)
+admin.site.register(Question)
+admin.site.register(Option)
+admin.site.register(UserAnswer)

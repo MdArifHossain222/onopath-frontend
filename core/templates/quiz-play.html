@@ -15,6 +15,20 @@
         MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+    .quiz-options-grid label.correct-opt {
+        background-color: #d1e7dd !important;
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+        font-weight: bold !important;
+    }
+    .quiz-options-grid label.wrong-opt {
+        background-color: #f8d7da !important;
+        border-color: #f5c2c7 !important;
+        color: red !important;
+        font-weight: bold !important;
+    }
+</style>
 </head>
 <body>
 
@@ -53,32 +67,47 @@
                     <span class="quiz-step-count">কুইজ সেশন</span>
                 </div>
 
-                {% with question=quiz.questions.first %}
                 {% if question %}
-                    <!-- Question Text -->
-                    <h3 class="quiz-question">
-                        {{ question.text }}
-                    </h3>
+                    <!-- Form শুরু হলো, যাতে ইউজার উত্তর সিলেক্ট করে সাবমিট করতে পারে -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <!-- Question Text -->
+                        <h3 class="quiz-question">
+                            {{ question.text }}
+                        </h3>
 
-                    <!-- Options List (Vertical Stack) -->
-                    <div class="quiz-options-grid">
-                        {% for option in question.options.all %}
-                            <button class="quiz-opt-btn">{{ option.text }}</button>
-                        {% endfor %}
-                    </div>
+                        <!-- Options List (Radio buttons / Buttons) -->
+                         {% if is_submitted %}
+    <div style="background: #ffeeba; padding: 10px; margin-bottom: 10px; border-radius: 5px; color: #856404;">
+        <b>ডিবাগিং ডাটা:</b> সঠিক উত্তর আইডি = {{ correct_option_id }} | আপনি সিলেক্ট করেছেন = {{ selected_option_id }}
+    </div>
+{% endif %}
+                        <div class="quiz-options-grid">
+                            {% for option in question.options.all %}
+                                <label class="quiz-opt-btn {% if is_submitted %}{% if option.id == correct_option_id %}correct-opt{% elif option.id == selected_option_id %}wrong-opt{% endif %}{% endif %}">
+                                    <input type="radio" name="option_id" value="{{ option.id }}" required {% if is_submitted %}disabled{% endif %} {% if selected_option_id == option.id %}checked{% endif %} style="margin-right: 8px;">
+                                    {{ option.text }}
+                                </label>
+                            {% endfor %}
+                        </div>
 
-                    <!-- Action Button -->
-                    <div class="quiz-footer-action">
-                        <button class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
-                    </div>
+                        <!-- Action Button -->
+                        {% if not is_submitted %}
+                        <div class="quiz-footer-action">
+                            <button type="submit" class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
+                        </div>
+                        {% endif %}
+                    </form>
 
-                    <!-- Explanation Section -->
-                    {% if question.explanation %}
-                    <div class="quiz-explanation">
+                    <!-- Explanation Section: এটি কেবল সাবমিট করার পরেই শো করবে -->
+                    {% if is_submitted and question.explanation %}
+                    <div class="quiz-explanation" style="margin-top: 20px;">
                         <h4>💡 ব্যাখ্যা:</h4>
                         <p>{{ question.explanation|safe }}</p>
                     </div>
                     {% endif %}
+
                 {% else %}
                     <!-- Static Fallback Template (যদি ডাটাবেজে প্রশ্ন যুক্ত করা না থাকে) -->
                     <h3 class="quiz-question">
@@ -103,7 +132,6 @@
                         সুতরাং, $v = 0 + (2 \times 4) = 8\text{ m/s}$।</p>
                     </div>
                 {% endif %}
-                {% endwith %}
 
             </div>
         </main>

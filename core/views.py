@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import StudentProfile, Notice, Subject, Chapter, Quiz
+from .models import StudentProfile, Notice, Subject, Chapter, Quiz, Question, Option, UserAnswer
 from .forms import UserUpdateForm, ProfileUpdateForm
 
 # ১. হোম ভিউ
@@ -117,14 +117,61 @@ def quiz(request):
     quizzes = Quiz.objects.all()
     return render(request, 'quiz.html', {'quizzes': quizzes})
 
-# ৯. কুইজ খেলা / প্লে ভিউ
+# ৯. কুইজ খেলা / প্লে ভিউ (সাবমিট এবং ব্যাখ্যা দেখানোর লজিকসহ)
 def quiz_play(request, quiz_id=None):
+    if not request.user.is_authenticated:
+        guest_quiz_count = request.session.get('guest_quiz_count', 0)
+        if guest_quiz_count >= 5:
+            messages.warning(request, 'আপনার ৫টি ফ্রি কুইজ সম্পন্ন হয়েছে। আরও কুইজ খেলতে অনুগ্রহ করে লগইন করুন।')
+            return redirect('auth_view')
+        request.session['guest_quiz_count'] = guest_quiz_count + 1
+
     if quiz_id:
         quiz_obj = get_object_or_404(Quiz, id=quiz_id)
     else:
-        quiz_obj = Quiz.objects.first()  # ডিফল্ট প্রথম কুইজ দেখানোর জন্য
+        quiz_obj = Quiz.objects.first()
+
+    question = quiz_obj.questions.first() if quiz_obj else None
+    is_submitted = False
+    selected_option_id = None
+    correct_option_id = None
+
+    if request.method == 'POST' and question:
+        is_submitted = True
+        raw_option_id = request.POST.get('option_id')
         
-    return render(request, 'quiz-play.html', {'quiz': quiz_obj})
+        if raw_option_id:
+            try:
+                selected_option_id = int(raw_option_id)  # ইন্টিজারে রূপান্তর করা হলো
+                selected_option = Option.objects.get(id=selected_option_id)
+                is_correct = selected_option.is_correct
+                
+                # যদি ইউজার লগইন করা থাকে, তার উত্তর ডাটাবেজে সেভ করা যাবে
+                if request.user.is_authenticated:
+                    UserAnswer.objects.create(
+                        user=request.user,
+                        quiz=quiz_obj,
+                        question=question,
+                        selected_option=selected_option,
+                        is_correct=is_correct
+                    )
+            except (Option.DoesNotExist, ValueError):
+                pass
+
+    # সঠিক অপশনটি খুঁজে বের করা (ব্যাখ্যা দেখানোর সময় সঠিক উত্তর মার্ক করার জন্য)
+    if question:
+        correct_opt = question.options.filter(is_correct=True).first()
+        if correct_opt:
+            correct_option_id = correct_opt.id
+
+    context = {
+        'quiz': quiz_obj,
+        'question': question,
+        'is_submitted': is_submitted,
+        'selected_option_id': selected_option_id,
+        'correct_option_id': correct_option_id,
+    }
+    return render(request, 'quiz-play.html', context)
 
 # ১০. স্টাডি সেকশন ভিউসমূহ
 def study(request):
