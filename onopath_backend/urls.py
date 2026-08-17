@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views  # এটি নতুন যুক্ত হয়েছে
 from core import views
 
 urlpatterns = [
@@ -14,6 +15,12 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile, name='profile'),
     
+    # পাসওয়ার্ড রিসেট রাউটসমূহ (ইমেইল ভিত্তিক)
+    path('password-reset/', auth_views.PasswordResetView.as_view(template_name='password/password_reset.html'), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password/password_reset_done.html'), name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password/password_reset_complete.html'), name='password_reset_complete'),
+
     # কুইজ সেকশন রাউটসমূহ (লেভেল, সাবজেক্ট, চ্যাপ্টার ও ডেইলি লুপ প্লে)
     path('quiz/', views.quiz_classes_view, name='quiz_classes'),
     path('quiz/subjects/<str:level>/', views.quiz_subjects, name='quiz_subjects'),

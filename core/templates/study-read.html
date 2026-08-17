@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -7,11 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     
     <!-- MathJax for rendering LaTeX math formulas -->
     <script>
-        MathJax = {
+        window.MathJax = {
           tex: {
             inlineMath: [['$', '$'], ['\\(', '\\)']]
           }
@@ -25,7 +26,7 @@
         <!-- Header -->
         <header class="navbar">
             <a href="{% url 'home' %}" class="logo-box">
-                <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
+                <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
@@ -47,11 +48,11 @@
         </header>
 
         <!-- Main Reading Content Container -->
-        <main class="quiz-play-container" style="max-width: 850px;">
-            <div class="quiz-play-card" style="text-align: left; padding: 35px 40px;">
+        <main class="quiz-play-container" style="max-width: 850px; margin: 40px auto; padding: 0 20px;">
+            <div class="quiz-play-card" style="text-align: left; padding: 35px 40px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                 
                 <!-- Navigation Top Bar -->
-                <div class="quiz-card-header" style="border-bottom: 1px solid #E2E8F0; padding-bottom: 12px; margin-bottom: 20px;">
+                <div class="quiz-card-header" style="border-bottom: 1px solid #E2E8F0; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <span class="quiz-subject-tag">⚛️ {{ chapter.subject.name }} • অধ্যায় {{ chapter.chapter_number }}</span>
                     <a href="{% url 'study_chapters' chapter.subject.id %}" class="btn-secondary-link">← অধ্যায় তালিকায় ফিরুন</a>
                 </div>
@@ -71,13 +72,13 @@
                     
                     {% for lesson in lessons %}
                         <div style="margin-bottom: 25px;">
-                            <h3 style="font-size: 18px; color: #0F172A; margin-top: 10px; margin-bottom: 8px;">{{ lesson.title }}</h3>
-                            <div style="background: rgba(255,255,255,0.85); padding: 18px 20px; border-radius: 8px; border: 1px solid #CBD5E1;">
+                            <h3 style="font-size: 18px; color: #0F172A; margin-top: 10px; margin-bottom: 8px; font-weight: 600;">{{ lesson.title }}</h3>
+                            <div style="background: #F8FAFC; padding: 18px 20px; border-radius: 8px; border: 1px solid #CBD5E1;">
                                 {{ lesson.content|safe|linebreaks }}
                             </div>
                         </div>
                     {% empty %}
-                        <div style="text-align: center; padding: 40px; color: #64748B;">
+                        <div style="text-align: center; padding: 40px; color: #64748B; background: #F8FAFC; border-radius: 8px; border: 1px dashed #CBD5E1;">
                             <p>এই অধ্যায়ের বিস্তারিত লেসন বা নোট এখনো প্রস্তুত করা হয়নি। খুব শীঘ্রই যুক্ত করা হবে!</p>
                         </div>
                     {% endfor %}

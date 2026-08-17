@@ -4,11 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>কুইজ সেকশন | অণুপাঠ (OnoPath)</title>
+    <title>{{ quiz.title|default:"কুইজ প্লে" }} | অণুপাঠ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'style.css' %}">
+
+    <!-- MathJax (LaTeX Display Only) -->
+    <script>
+        MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+    .quiz-options-grid label.correct-opt {
+        background-color: #d1e7dd !important;
+        border-color: #badbcc !important;
+        color: #0f5132 !important;
+        font-weight: bold !important;
+    }
+    .quiz-options-grid label.wrong-opt {
+        background-color: #f8d7da !important;
+        border-color: #f5c2c7 !important;
+        color: red !important;
+        font-weight: bold !important;
+    }
+    </style>
 </head>
 <body>
 
@@ -37,44 +57,95 @@
             </div>
         </header>
 
-        <!-- Main Page Area -->
-        <main class="page-content">
-            <div class="page-title">
-                <h2>অনলাইন কুইজ টেস্ট 🎯</h2>
-                <p>বিষয় সিলেক্ট করে ডেমো কুইজে অংশ নিন এবং প্রতিটি প্রশ্নের নির্ভুল ব্যাখ্যা দেখে নিজেকে যাচাই করুন।</p>
-            </div>
+        <!-- Main Content Area -->
+        <main class="quiz-play-container">
+            
+            {% if daily_mcqs %}
+                {% for q in daily_mcqs %}
+                <div class="quiz-play-card" style="margin-bottom: 30px;">
+                    
+                    <!-- Top Info Bar -->
+                    <div class="quiz-card-header">
+                        <span class="quiz-subject-tag">⚡ {{ chapter.title|default:"পদার্থবিজ্ঞান: গতি ও বল" }}</span>
+                        <span class="quiz-step-count">প্রশ্ন {{ forloop.counter }}</span>
+                    </div>
 
-            <div class="subject-grid">
-                {% for q in quizzes %}
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">⚡</span>
-                        <h3>{{ q.title }}</h3>
+                    <!-- প্রতিটি প্রশ্ন এখন আলাদা আলাদা ফর্মের ভেতরে থাকবে -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="question_id" value="{{ q.id }}">
+                        
+                        <!-- Question Text -->
+                        <h3 class="quiz-question">
+                            {{ forloop.counter }}. {{ q.text }}
+                        </h3>
+
+                        <!-- Options List -->
+                        <div class="quiz-options-grid">
+                            {% for option in q.options.all %}
+                                <label class="quiz-opt-btn {% if submitted_qid == q.id %}{% if option.id == correct_option_id %}correct-opt{% elif option.id == selected_option_id %}wrong-opt{% endif %}{% endif %}">
+                                    <input type="radio" name="option_id" value="{{ option.id }}" required {% if submitted_qid == q.id %}disabled{% endif %} {% if submitted_qid == q.id and selected_option_id == option.id %}checked{% endif %} style="margin-right: 8px;">
+                                    {{ option.text }}
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Action Button: উত্তর জমা দেওয়ার আগে দেখাবে, এই নির্দিষ্ট প্রশ্ন জমা হলে লুকিয়ে যাবে -->
+                        {% if submitted_qid != q.id %}
+                        <div class="quiz-footer-action">
+                            <button type="submit" class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
+                        </div>
+                        {% endif %}
+                    </form>
+
+                    <!-- Explanation Section: এটি কেবল এই প্রশ্নটি সাবমিট করার পরেই শো করবে -->
+                    {% if submitted_qid == q.id and q.explanation %}
+                    <div class="quiz-explanation" style="margin-top: 20px; display: block;">
+                        <h4>💡 ব্যাখ্যা:</h4>
+                        <p>{{ q.explanation|safe }}</p>
                     </div>
-                    <p>{{ q.description|default:"এই কুইজে অংশ নিয়ে আপনার প্রস্তুতি যাচাই করুন।" }}</p>
-                    <a href="{% url 'quiz_play' q.id %}" class="btn-card-action">কুইজ শুরু করুন 🚀</a>
-                </div>
-                {% empty %}
-                <!-- স্ট্যাটিক ব্যাকআপ বা ডিফল্ট কার্ড যদি ডাটাবেজে কুইজ না থাকে -->
-                <div class="subject-card">
-                    <div class="card-header-inline">
-                        <span class="subj-icon">⚡</span>
-                        <h3>পদার্থবিজ্ঞান কুইজ</h3>
-                    </div>
-                    <p>গতি ও বল অধ্যায়ের উপর ৫টি ইনস্ট্যান্ট কুইজ টেস্ট।</p>
-                    <a href="{% url 'quiz_classes' %}" class="btn-card-action">খুব শীঘ্রই আসছে 🚀</a>
+                    {% endif %}
+
                 </div>
                 {% endfor %}
-            </div>
+
+            {% else %}
+                <!-- Static Fallback Template (যদি ডাটাবেজে প্রশ্ন যুক্ত করা না থাকে) -->
+                <div class="quiz-play-card">
+                    <div class="quiz-card-header">
+                        <span class="quiz-subject-tag">⚡ পদার্থবিজ্ঞান: গতি ও বল</span>
+                        <span class="quiz-step-count">কুইজ সেশন</span>
+                    </div>
+
+                    <h3 class="quiz-question">
+                        ১. একটি বস্তু স্থির অবস্থান থেকে $2\text{ m/s}^2$ সুষম ত্বরণে চলতে শুরু করলে $4\text{ s}$ পর এর বেগ কত হবে?
+                    </h3>
+
+                    <div class="quiz-options-grid">
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> ক) $4\text{ m/s}$</label>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> খ) $8\text{ m/s}$</label>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> গ) $16\text{ m/s}$</label>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> ঘ) $2\text{ m/s}$</label>
+                    </div>
+
+                    <div class="quiz-footer-action">
+                        <button class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
+                    </div>
+
+                    <div class="quiz-explanation" style="display: none;">
+                        <h4>💡 ব্যাখ্যা:</h4>
+                        <p>আমরা জানি, $v = u + at$。<br>
+                        এখানে আদিবেগ $u = 0$, ত্বরণ $a = 2\text{ m/s}^2$ এবং সময় $t = 4\text{ s}$。<br>
+                        সুতরাং, $v = 0 + (2 \times 4) = 8\text{ m/s}$。</p>
+                    </div>
+                </div>
+            {% endif %}
+
         </main>
 
         <!-- Footer Bar -->
         <footer class="footer-bar">
-            <div class="footer-quote"><span>🌱</span> "জ্ঞানই শক্তি, সচেতনতাই পরিবর্তন"</div>
-            <div class="footer-links">
-                <a href="#">গোপনীয়তা নীতি</a>
-                <a href="#">ব্যবহারকারীর শর্তাবলী</a>
-            </div>
+            <div class="footer-quote"><span>🌱</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
         </footer>
     </div>
 

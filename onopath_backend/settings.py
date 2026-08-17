@@ -110,9 +110,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_REDIRECT_URL = 'profile'
 
-# Email
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# Email Configuration (পাসওয়ার্ড রিসেটের জন্য ইমেইল সেটিংস)
+# বর্তমানে এটি কনসোল ব্যাকএন্ডে সেট করা আছে, যাতে লোকাল টেস্ট করার সময় ইমেইল সরাসরি আপনার টার্মিনালে বা কনসোলে দেখা যায়।
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'support@onopath.com'

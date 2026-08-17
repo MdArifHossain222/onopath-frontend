@@ -53,8 +53,7 @@
                         <h3 style="font-size: 28px; font-weight: 700; color: #0F172A; margin: 0; line-height: 1;">SSC</h3>
                     </div>
                     <p style="margin-bottom: 20px; color: #475569; font-size: 14.5px;">নবম-দশম শ্রেণি কুইজ টেস্ট</p>
-                    <!-- আপনি চাইলে এখানে এসএসসির কুইজ লিস্ট পেজে যাওয়ার লিংক দিতে পারেন -->
-                    <a href="#" class="btn-card-action" style="display: inline-block;">কুইজ শুরু করুন 🚀</a>
+                    <a href="{% url 'quiz_subjects' 'ssc' %}" class="btn-card-action" style="display: inline-block;">কুইজ শুরু করুন 🚀</a>
                 </div>
 
                 <!-- HSC Quiz Card -->
@@ -64,8 +63,7 @@
                         <h3 style="font-size: 28px; font-weight: 700; color: #0F172A; margin: 0; line-height: 1;">HSC</h3>
                     </div>
                     <p style="margin-bottom: 20px; color: #475569; font-size: 14.5px;">একাদশ-দ্বাদশ শ্রেণি কুইজ টেস্ট</p>
-                    <!-- আপনি চাইলে এখানে এইচএসসির কুইজ লিস্ট পেজে যাওয়ার লিংক দিতে পারেন -->
-                    <a href="#" class="btn-card-action" style="display: inline-block;">কুইজ শুরু করুন 🚀</a>
+                    <a href="{% url 'quiz_subjects' 'hsc' %}" class="btn-card-action" style="display: inline-block;">কুইজ শুরু করুন 🚀</a>
                 </div>
             </div>
         </main>
@@ -73,6 +71,11 @@
         <!-- Footer Bar -->
         <footer class="footer-bar">
             <div class="footer-quote"><span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
+        </footer>
+    </div>
+
+</body>
+</html>
         </footer>
     </div>
 

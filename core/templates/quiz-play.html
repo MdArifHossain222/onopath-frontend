@@ -28,7 +28,7 @@
         color: red !important;
         font-weight: bold !important;
     }
-</style>
+    </style>
 </head>
 <body>
 
@@ -59,81 +59,88 @@
 
         <!-- Main Content Area -->
         <main class="quiz-play-container">
-            <div class="quiz-play-card">
-                
-                <!-- Top Info Bar -->
-                <div class="quiz-card-header">
-                    <span class="quiz-subject-tag">⚡ {{ quiz.title|default:"পদার্থবিজ্ঞান: গতি ও বল" }}</span>
-                    <span class="quiz-step-count">কুইজ সেশন</span>
-                </div>
+            
+            {% if daily_mcqs %}
+                {% for q in daily_mcqs %}
+                <div class="quiz-play-card" style="margin-bottom: 30px;">
+                    
+                    <!-- Top Info Bar -->
+                    <div class="quiz-card-header">
+                        <span class="quiz-subject-tag">⚡ {{ chapter.title|default:"পদার্থবিজ্ঞান: গতি ও বল" }}</span>
+                        <span class="quiz-step-count">প্রশ্ন {{ forloop.counter }}</span>
+                    </div>
 
-                {% if question %}
-                    <!-- Form শুরু হলো, যাতে ইউজার উত্তর সিলেক্ট করে সাবমিট করতে পারে -->
+                    <!-- প্রতিটি প্রশ্ন এখন আলাদা আলাদা ফর্মের ভেতরে থাকবে -->
                     <form method="POST">
                         {% csrf_token %}
+                        <input type="hidden" name="question_id" value="{{ q.id }}">
                         
                         <!-- Question Text -->
                         <h3 class="quiz-question">
-                            {{ question.text }}
+                            {{ forloop.counter }}. {{ q.text }}
                         </h3>
 
-                        <!-- Options List (Radio buttons / Buttons) -->
-                         {% if is_submitted %}
-    <div style="background: #ffeeba; padding: 10px; margin-bottom: 10px; border-radius: 5px; color: #856404;">
-        <b>ডিবাগিং ডাটা:</b> সঠিক উত্তর আইডি = {{ correct_option_id }} | আপনি সিলেক্ট করেছেন = {{ selected_option_id }}
-    </div>
-{% endif %}
+                        <!-- Options List -->
                         <div class="quiz-options-grid">
-                            {% for option in question.options.all %}
-                                <label class="quiz-opt-btn {% if is_submitted %}{% if option.id == correct_option_id %}correct-opt{% elif option.id == selected_option_id %}wrong-opt{% endif %}{% endif %}">
-                                    <input type="radio" name="option_id" value="{{ option.id }}" required {% if is_submitted %}disabled{% endif %} {% if selected_option_id == option.id %}checked{% endif %} style="margin-right: 8px;">
+                            {% for option in q.options.all %}
+                                <label class="quiz-opt-btn {% if submitted_qid == q.id %}{% if option.id == correct_option_id %}correct-opt{% elif option.id == selected_option_id %}wrong-opt{% endif %}{% endif %}">
+                                    <input type="radio" name="option_id" value="{{ option.id }}" required {% if submitted_qid == q.id %}disabled{% endif %} {% if submitted_qid == q.id and selected_option_id == option.id %}checked{% endif %} style="margin-right: 8px;">
                                     {{ option.text }}
                                 </label>
                             {% endfor %}
                         </div>
 
-                        <!-- Action Button -->
-                        {% if not is_submitted %}
+                        <!-- Action Button: উত্তর জমা দেওয়ার আগে দেখাবে, এই নির্দিষ্ট প্রশ্ন জমা হলে লুকিয়ে যাবে -->
+                        {% if submitted_qid != q.id %}
                         <div class="quiz-footer-action">
                             <button type="submit" class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
                         </div>
                         {% endif %}
                     </form>
 
-                    <!-- Explanation Section: এটি কেবল সাবমিট করার পরেই শো করবে -->
-                    {% if is_submitted and question.explanation %}
-                    <div class="quiz-explanation" style="margin-top: 20px;">
+                    <!-- Explanation Section: এটি কেবল এই প্রশ্নটি সাবমিট করার পরেই শো করবে -->
+                    {% if submitted_qid == q.id and q.explanation %}
+                    <div class="quiz-explanation" style="margin-top: 20px; display: block;">
                         <h4>💡 ব্যাখ্যা:</h4>
-                        <p>{{ question.explanation|safe }}</p>
+                        <p>{{ q.explanation|safe }}</p>
                     </div>
                     {% endif %}
 
-                {% else %}
-                    <!-- Static Fallback Template (যদি ডাটাবেজে প্রশ্ন যুক্ত করা না থাকে) -->
+                </div>
+                {% endfor %}
+
+            {% else %}
+                <!-- Static Fallback Template (যদি ডাটাবেজে প্রশ্ন যুক্ত করা না থাকে) -->
+                <div class="quiz-play-card">
+                    <div class="quiz-card-header">
+                        <span class="quiz-subject-tag">⚡ পদার্থবিজ্ঞান: গতি ও বল</span>
+                        <span class="quiz-step-count">কুইজ সেশন</span>
+                    </div>
+
                     <h3 class="quiz-question">
                         ১. একটি বস্তু স্থির অবস্থান থেকে $2\text{ m/s}^2$ সুষম ত্বরণে চলতে শুরু করলে $4\text{ s}$ পর এর বেগ কত হবে?
                     </h3>
 
                     <div class="quiz-options-grid">
-                        <button class="quiz-opt-btn">ক) $4\text{ m/s}$</button>
-                        <button class="quiz-opt-btn selected-opt">খ) $8\text{ m/s}$</button>
-                        <button class="quiz-opt-btn">গ) $16\text{ m/s}$</button>
-                        <button class="quiz-opt-btn">ঘ) $2\text{ m/s}$</button>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> ক) $4\text{ m/s}$</label>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> খ) $8\text{ m/s}$</label>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> গ) $16\text{ m/s}$</label>
+                        <label class="quiz-opt-btn"><input type="radio" name="fallback_opt"> ঘ) $2\text{ m/s}$</label>
                     </div>
 
                     <div class="quiz-footer-action">
                         <button class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
                     </div>
 
-                    <div class="quiz-explanation">
+                    <div class="quiz-explanation" style="display: none;">
                         <h4>💡 ব্যাখ্যা:</h4>
-                        <p>আমরা জানি, $v = u + at$।<br>
-                        এখানে আদিবেগ $u = 0$, ত্বরণ $a = 2\text{ m/s}^2$ এবং সময় $t = 4\text{ s}$।<br>
-                        সুতরাং, $v = 0 + (2 \times 4) = 8\text{ m/s}$।</p>
+                        <p>আমরা জানি, $v = u + at$。<br>
+                        এখানে আদিবেগ $u = 0$, ত্বরণ $a = 2\text{ m/s}^2$ এবং সময় $t = 4\text{ s}$。<br>
+                        সুতরাং, $v = 0 + (2 \times 4) = 8\text{ m/s}$。</p>
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
 
-            </div>
         </main>
 
         <!-- Footer Bar -->
