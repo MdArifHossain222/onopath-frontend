@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শ্রেণি নির্বাচন - অণুপাঠ (OnoPath)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+    <div class="hero-container">
+        <!-- Header -->
+        <header class="navbar">
+            <a href="{% url 'home' %}" class="logo-box">
+                <img src="{% static 'logopng.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">হোম</a></li>
+                    <li><a href="{% url 'study_classes' %}" class="active">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz_classes' %}">কুইজ</a></li>
+                    <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="btn-login">👤 প্রোফাইল</a>
+                    <a href="{% url 'logout' %}" class="btn-signup">লগআউট</a>
+                {% else %}
+                    <a href="{% url 'auth' %}" class="btn-login">লগইন করুন</a>
+                    <a href="{% url 'auth' %}" class="btn-signup">অ্যাকাউন্ট তৈরি করুন</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Main Page Area -->
+        <main class="page-content">
+            <div class="page-title">
+                <h2>আপনার শ্রেণি নির্বাচন করুন 🎓</h2>
+                <p>আপনার কাঙ্ক্ষিত শিক্ষাস্তর সিলেক্ট করে পরবর্তী ধাপে প্রবেশ করুন।</p>
+            </div>
+
+            <!-- শ্রেণি সিলেক্ট করার কার্ড বা বাটনগুলো -->
+            <div class="subject-grid">
+                <!-- SSC Card -->
+                <div class="subject-card" style="text-align: center; padding: 35px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;">
+                        <span style="font-size: 30px; line-height: 1;">🏫</span>
+                        <h3 style="font-size: 28px; font-weight: 700; color: #0F172A; margin: 0; line-height: 1;">SSC</h3>
+                    </div>
+                    <p style="margin-bottom: 20px; color: #475569; font-size: 14.5px;">নবম-দশম শ্রেণি (বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষা)</p>
+                    <a href="{% url 'study_subjects' 'ssc' %}" class="btn-card-action" style="display: inline-block;">সিলেক্ট করুন 🚀</a>
+                </div>
+
+                <!-- HSC Card -->
+                <div class="subject-card" style="text-align: center; padding: 35px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;">
+                        <span style="font-size: 30px; line-height: 1;">🏛️</span>
+                        <h3 style="font-size: 28px; font-weight: 700; color: #0F172A; margin: 0; line-height: 1;">HSC</h3>
+                    </div>
+                    <p style="margin-bottom: 20px; color: #475569; font-size: 14.5px;">একাদশ-দ্বাদশ শ্রেণি (বিজ্ঞান, মানবিক ও ব্যবসায় শিক্ষা)</p>
+                    <a href="{% url 'study_subjects' 'hsc' %}" class="btn-card-action" style="display: inline-block;">সিলেক্ট করুন 🚀</a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Bar -->
+        <footer class="footer-bar">
+            <div class="footer-quote"><span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
+        </footer>
+    </div>
+
+</body>
+</html>

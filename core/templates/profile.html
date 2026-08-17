@@ -16,13 +16,13 @@
         <!-- Header -->
         <header class="navbar">
             <a href="{% url 'home' %}" class="logo-box">
-                <img src="{% static 'logo.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
+                <img src="{% static 'logopng.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">হোম</a></li>
                     <li><a href="{% url 'study' %}">স্টাডি</a></li>
-                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'quiz_classes' %}">কুইজ</a></li>
                     <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
@@ -134,7 +134,7 @@
                                 <div style="font-size: 12px; color: #64748B;">কুইজ স্কোর: ৪/৪ (১০০%)</div>
                             </div>
                         </div>
-                        <a href="{% url 'quiz' %}" class="btn-card-action" style="padding: 6px 12px; font-size: 12.5px;">পুনরায় কুইজ দিন</a>
+                        <a href="{% url 'quiz_classes' %}" class="btn-card-action" style="padding: 6px 12px; font-size: 12.5px;">পুনরায় কুইজ দিন</a>
                     </div>
 
                     <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">

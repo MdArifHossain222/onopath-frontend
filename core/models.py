@@ -25,14 +25,17 @@ class Notice(models.Model):
         return self.title
 
 
-# ১. বিষয় (যেমন: পদার্থবিজ্ঞান, রসায়ন)
 class Subject(models.Model):
+    LEVEL_CHOICES = (
+        ('SSC', 'SSC'),
+        ('HSC', 'HSC'),
+    )
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='SSC')
     name = models.CharField(max_length=100)
-    icon = models.CharField(max_length=50, default="📚")
-    description = models.TextField(blank=True, null=True)
-
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    
     def __str__(self):
-        return self.name
+        return f"{self.level} - {self.name}"
 
 
 # ২. অধ্যায় (যেমন: গতি, বল, কাজ-ক্ষমতা-শক্তি)
@@ -55,25 +58,31 @@ class Lesson(models.Model):
         return f"Lesson: {self.title or self.chapter.title}"
 
 
-# ৪. কুইজ মডেল
+# ৪. কুইজ মডেল (অধ্যায়ভিত্তিক)
 class Quiz(models.Model):
-    title = models.CharField(max_length=200, verbose_name="কুইজের শিরোনাম")
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='quizzes', null=True, blank=True)
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='quizzes', null=True, blank=True)
+    title = models.CharField(max_length=200, verbose_name="কুইজের শিরোনাম/অধ্যায়")
     description = models.TextField(blank=True, verbose_name="বর্ণনা")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.chapter.title if self.chapter else ''} - {self.title}"
 
 
-# ৫. কুইজের প্রশ্ন মডেল
+# ৫. কুইজের প্রশ্ন মডেল (MCQ এবং Solve আলাদা করার জন্য)
 class Question(models.Model):
+    QUESTION_TYPES = (
+        ('mcq', 'এমসিকিউ (MCQ)'),
+        ('solve', 'সলভ প্রশ্ন (Solving Question)'),
+    )
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField(verbose_name="প্রশ্ন")
-    explanation = models.TextField(blank=True, verbose_name="ব্যাখ্যা")
+    question_type = models.CharField(max_length=10, choices=QUESTION_TYPES, default='mcq', verbose_name="প্রশ্নের ধরন")
+    explanation = models.TextField(blank=True, verbose_name="ব্যাখ্যা / সলভ")
+    order_number = models.IntegerField(default=1, verbose_name="লুপ সিরিয়াল নম্বর")
 
     def __str__(self):
-        return self.text[:50]
+        return f"[{self.get_question_type_display()}] {self.text[:50]}"
 
 
 # ৬. প্রশ্নের অপশন মডেল
@@ -90,11 +99,10 @@ class Option(models.Model):
 # ৭. ইউজারের উত্তর সংরক্ষণের মডেল
 class UserAnswer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
     is_correct = models.BooleanField(default=False)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - Question {self.question.id} ({'সঠিক' if self.is_correct else 'ভুল'})"
+        return f"{self.user.username} - Q.{self.question.id} ({'সঠিক' if self.is_correct else 'ভুল'})"

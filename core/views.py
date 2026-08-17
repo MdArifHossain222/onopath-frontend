@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.contrib.auth.decorators import login_required
+from datetime import date
 
 from .models import StudentProfile, Notice, Subject, Chapter, Quiz, Question, Option, UserAnswer
 from .forms import UserUpdateForm, ProfileUpdateForm
@@ -46,9 +48,14 @@ def signup_view(request):
 
 # ৪. লগইন লজিক
 def login_view(request):
+    # আগের জমে থাকা সব মেসেজ পরিষ্কার করে দেওয়া
+    storage = get_messages(request)
+    for _ in storage:
+        pass
+
     if request.method == 'POST':
-        user_input = request.POST.get('username')
-        password = request.POST.get('password')
+        user_input = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
 
         user = authenticate(request, username=user_input, password=password)
 
@@ -72,7 +79,7 @@ def login_view(request):
             return redirect('profile')
         else:
             messages.error(request, 'ইমেইল, ফোন নম্বর বা পাসওয়ার্ড ভুল হয়েছে!')
-            return render(request, 'auth.html')
+            return render(request, 'auth.html', {'saved_username': user_input})
 
     return render(request, 'auth.html')
 
@@ -112,71 +119,103 @@ def about(request):
     notices = Notice.objects.all().order_by('-created_at')
     return render(request, 'about.html', {'notices': notices})
 
-# ৮. কুইজ পেজ (তালিকা) ভিউ
-def quiz(request):
-    quizzes = Quiz.objects.all()
-    return render(request, 'quiz.html', {'quizzes': quizzes})
 
-# ৯. কুইজ খেলা / প্লে ভিউ (সাবমিট এবং ব্যাখ্যা দেখানোর লজিকসহ)
-def quiz_play(request, quiz_id=None):
-    if not request.user.is_authenticated:
-        guest_quiz_count = request.session.get('guest_quiz_count', 0)
-        if guest_quiz_count >= 5:
-            messages.warning(request, 'আপনার ৫টি ফ্রি কুইজ সম্পন্ন হয়েছে। আরও কুইজ খেলতে অনুগ্রহ করে লগইন করুন।')
-            return redirect('auth_view')
-        request.session['guest_quiz_count'] = guest_quiz_count + 1
+# ==========================================
+# কুইজ সেকশন (ডেইলি রোটেশন ও লেভেলভিত্তিক লজিক)
+# ==========================================
 
-    if quiz_id:
-        quiz_obj = get_object_or_404(Quiz, id=quiz_id)
-    else:
-        quiz_obj = Quiz.objects.first()
+def quiz_classes_view(request):
+    return render(request, 'quiz_classes.html')
 
-    question = quiz_obj.questions.first() if quiz_obj else None
-    is_submitted = False
-    selected_option_id = None
-    correct_option_id = None
+def quiz_subjects(request, level):
+    level = level.upper()
+    if level not in ['SSC', 'HSC']:
+        level = 'SSC'
+    
+    subjects = Subject.objects.filter(level=level)
+    context = {
+        'subjects': subjects,
+        'level': level,
+    }
+    return render(request, 'quiz-subjects.html', context)
 
-    if request.method == 'POST' and question:
-        is_submitted = True
+def quiz_chapters(request, subject_id):
+    subject = get_object_or_404(Subject, id=subject_id)
+    chapters = subject.chapters.all().order_by('chapter_number')
+    return render(request, 'quiz-chapters.html', {'subject': subject, 'chapters': chapters})
+
+def daily_quiz_play(request, chapter_id):
+    chapter = get_object_or_404(Chapter, id=chapter_id)
+    
+    today_seed = (date.today() - date(2026, 1, 1)).days
+    
+    all_mcqs = Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id')
+    all_solves = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id')
+    
+    daily_mcqs = []
+    daily_solve = None
+
+    if all_mcqs.exists():
+        chunk_size = 5
+        total_mcqs = all_mcqs.count()
+        start_index = (today_seed * chunk_size) % total_mcqs
+        end_index = start_index + chunk_size
+        
+        if end_index <= total_mcqs:
+            daily_mcqs = list(all_mcqs[start_index:end_index])
+        else:
+            daily_mcqs = list(all_mcqs[start_index:]) + list(all_mcqs[:end_index % total_mcqs])
+
+    if all_solves.exists():
+        solve_index = today_seed % all_solves.count()
+        daily_solve = all_solves[solve_index]
+
+    if request.method == 'POST':
+        question_id = request.POST.get('question_id')
         raw_option_id = request.POST.get('option_id')
         
-        if raw_option_id:
+        if question_id and raw_option_id:
             try:
-                selected_option_id = int(raw_option_id)  # ইন্টিজারে রূপান্তর করা হলো
-                selected_option = Option.objects.get(id=selected_option_id)
+                question = Question.objects.get(id=question_id)
+                selected_option = Option.objects.get(id=raw_option_id)
                 is_correct = selected_option.is_correct
                 
-                # যদি ইউজার লগইন করা থাকে, তার উত্তর ডাটাবেজে সেভ করা যাবে
                 if request.user.is_authenticated:
                     UserAnswer.objects.create(
                         user=request.user,
-                        quiz=quiz_obj,
                         question=question,
                         selected_option=selected_option,
                         is_correct=is_correct
                     )
-            except (Option.DoesNotExist, ValueError):
-                pass
-
-    # সঠিক অপশনটি খুঁজে বের করা (ব্যাখ্যা দেখানোর সময় সঠিক উত্তর মার্ক করার জন্য)
-    if question:
-        correct_opt = question.options.filter(is_correct=True).first()
-        if correct_opt:
-            correct_option_id = correct_opt.id
+                messages.success(request, 'আপনার উত্তর সফলভাবে জমা হয়েছে!')
+            except (Question.DoesNotExist, Option.DoesNotExist):
+                messages.error(request, 'ত্রুটি ঘটেছে, আবার চেষ্টা করুন।')
 
     context = {
-        'quiz': quiz_obj,
-        'question': question,
-        'is_submitted': is_submitted,
-        'selected_option_id': selected_option_id,
-        'correct_option_id': correct_option_id,
+        'chapter': chapter,
+        'daily_mcqs': daily_mcqs,
+        'daily_solve': daily_solve,
     }
     return render(request, 'quiz-play.html', context)
 
+
+# ==========================================
 # ১০. স্টাডি সেকশন ভিউসমূহ
-def study(request):
-    subjects = Subject.objects.all()
-    return render(request, 'study.html', {'subjects': subjects})
+# ==========================================
+def study_classes(request):
+    return render(request, 'study-classes.html')
+
+def study_subjects(request, level):
+    level = level.upper()
+    if level not in ['SSC', 'HSC']:
+        level = 'SSC'
+    
+    subjects = Subject.objects.filter(level=level)
+    context = {
+        'subjects': subjects,
+        'level': level,
+    }
+    return render(request, 'study-subject.html', context)
 
 def study_chapters(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)

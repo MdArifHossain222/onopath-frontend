@@ -31,7 +31,7 @@
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">হোম</a></li>
                     <li><a href="{% url 'study' %}" class="active">স্টাডি</a></li>
-                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'quiz_classes' %}">কুইজ</a></li>
                     <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
@@ -87,7 +87,7 @@
                 <!-- Bottom Navigation / Quick Test -->
                 <div style="margin-top: 35px; padding-top: 20px; border-top: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <a href="{% url 'study_chapters' chapter.subject.id %}" class="btn-secondary-link">← অধ্যায় তালিকায় ফিরুন</a>
-                    <a href="{% url 'quiz' %}" class="btn-card-action" style="text-decoration: none;">এই অধ্যায়ের কুইজ দিন 🎯</a>
+                    <a href="{% url 'quiz_classes' %}" class="btn-card-action" style="text-decoration: none;">এই অধ্যায়ের কুইজ দিন 🎯</a>
                 </div>
 
             </div>

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -7,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
@@ -15,13 +16,13 @@
         <!-- Header -->
         <header class="navbar">
             <a href="{% url 'home' %}" class="logo-box">
-                <img src="logo.png" alt="অণুপাঠ লোগো" class="nav-logo">
+                <img src="{% static 'logopng.png' %}" alt="অণুপাঠ লোগো" class="nav-logo">
             </a>
             <nav>
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">হোম</a></li>
-                    <li><a href="{% url 'study' %}" class="active">স্টাডি</a></li>
-                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'study_classes' %}" class="active">স্টাডি</a></li>
+                    <li><a href="{% url 'quiz_classes' %}">কুইজ</a></li>
                     <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
@@ -42,7 +43,7 @@
                 
                 <div class="quiz-card-header">
                     <span class="quiz-subject-tag">📚 {{ subject.name }}</span>
-                    <a href="{% url 'study' %}" class="btn-secondary-link">← বিষয় তালিকায় ফিরুন</a>
+                    <a href="{% url 'study_classes' %}" class="btn-secondary-link">← শ্রেণি তালিকায় ফিরুন</a>
                 </div>
 
                 <h2 style="font-size: 20px; color: #0F172A; margin-bottom: 6px;">অধ্যায় নির্বাচন করুন</h2>
@@ -55,12 +56,12 @@
                     <div style="background: rgba(255,255,255,0.85); border: 1px solid #CBD5E1; border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <h4 style="font-size: 15.5px; color: #0F172A; margin-bottom: 2px;">অধ্যায় {{ chapter.chapter_number }}: {{ chapter.title }}</h4>
-                            <p style="font-size: 13px; color: #64748B;">অধ্যায়ের বিস্তারিত নোট পড়তে ডানপাশের বাটনে ক্লিক করুন।</p>
+                            <p style="font-size: 13px; color: #64748B;">অধ্যায়ের বিস্তারিত নোট পড়তে ডানপাশের বাটনে ক্লিক করুন।</p>
                         </div>
                         <a href="{% url 'study_read' chapter.id %}" class="btn-card-action">পড়া শুরু করুন 📖</a>
                     </div>
                     {% empty %}
-                    <p style="text-align: center; color: #64748B; padding: 20px;">এই বিষয়ে বর্তমানে কোনো অধ্যায় যুক্ত করা হয়নি।</p>
+                    <p style="text-align: center; color: #64748B; padding: 20px;">এই বিষয়ে বর্তমানে কোনো অধ্যায় যুক্ত করা হয়নি।</p>
                     {% endfor %}
 
                 </div>

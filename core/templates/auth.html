@@ -22,7 +22,7 @@
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">হোম</a></li>
                     <li><a href="{% url 'study' %}">স্টাডি</a></li>
-                    <li><a href="{% url 'quiz' %}">কুইজ</a></li>
+                    <li><a href="{% url 'quiz_classes' %}">কুইজ</a></li>
                     <li><a href="{% url 'about' %}">আমাদের কথা</a></li>
                 </ul>
             </nav>
@@ -48,30 +48,44 @@
                        color: #64748B; cursor: pointer;">নতুন অ্যাকাউন্ট</button>
                 </div>
 
+                <!-- Django Messages (Error/Success Display - Single Unique Message) -->
+                {% if messages %}
+                    <div style="margin-bottom: 20px;">
+                        {% for message in messages %}
+                            {% if forloop.first %}
+                                <p style="color: {% if message.tags == 'error' %}#ef4444{% else %}#10B981{% endif %}; font-size: 14px; font-weight: 600; margin: 0; text-align: center; background: {% if message.tags == 'error' %}#fef2f2{% else %}#ecfdf5{% endif %}; padding: 10px; border-radius: 6px;">
+                                    {{ message }}
+                                </p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <!-- LOGIN FORM -->
                 <form id="login-form" action="{% url 'login' %}" method="POST" style="display: flex; 
                 flex-direction: column; gap: 16px;"> {% csrf_token %}
-                 <div>
+                    <div>
                         <label style="display: block; font-size: 14px; font-weight: 600;
                          color: #334155; margin-bottom: 6px;">ইমেইল বা মোবাইল নম্বর</label>
-                        <input type="text" name="username" placeholder="example@mail.com বা 017xxxxxxxx" required style="width: 100%;
+                        <!-- saved_username দিয়ে ভুল পাসওয়ার্ড দিলেও ইমেইল ধরে রাখা হচ্ছে -->
+                        <input type="text" name="username" value="{{ saved_username|default:'' }}" autocomplete="new-password" placeholder="example@mail.com বা 017xxxxxxxx" required style="width: 100%;
                          padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; 
                          font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none;">
                     </div>
 
                     <div>
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
-                         margin-bottom: 6px;">পাসওয়ার্ড</label>
-                        <input type="password" name="password" placeholder="••••••••" required style="width: 100%;
+                         margin-bottom: 6px;">পাসওয়ার্ড</label>
+                        <input type="password" name="password" autocomplete="new-password" placeholder="••••••••" required style="width: 100%;
                          padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: inherit; 
                          font-size: 14px; box-sizing: border-box; outline: none;">
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center;
                      margin-top: -4px;">
-                        <span style="font-size: 12px; color: #64748B;">পাসওয়ার্ড মনে নেই?</span>
+                        <span style="font-size: 12px; color: #64748B;">পাসওয়ার্ড মনে নেই?</span>
                         <a href="#" style="font-size: 12.5px; color: #059669; text-decoration: none;
-                         font-weight: 600;">SMS/OTP দিয়ে লগইন করুন</a>
+                         font-weight: 600;">SMS/OTP দিয়ে লগইন করুন</a>
                     </div>
 
                     <button type="submit" class="btn-card-action" style="width: 100%; padding: 12px; 
@@ -85,7 +99,7 @@
                     <div>
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
                          margin-bottom: 6px;">আপনার পূর্ণ নাম</label>
-                        <input type="text" name="full_name" placeholder="যেমন: মো: আবদুল্লাহ" required style="width: 100%; 
+                        <input type="text" name="full_name" autocomplete="new-password" placeholder="যেমন: মো: আবদুল্লাহ" required style="width: 100%; 
                         padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px;
                          font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none;">
                     </div>
@@ -93,7 +107,7 @@
                     <div>
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
                          margin-bottom: 6px;">ইমেইল এড্রেস</label>
-                        <input type="email" name="email" placeholder="example@gmail.com" required style="width: 100%;
+                        <input type="email" name="email" autocomplete="new-password" placeholder="example@gmail.com" required style="width: 100%;
                          padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px;
                           font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none;">
                     </div>
@@ -108,8 +122,8 @@
 
                     <div>
                         <label style="display: block; font-size: 14px; font-weight: 600; color: #334155;
-                         margin-bottom: 6px;">পাসওয়ার্ড তৈরি করুন</label>
-                        <input type="password" name="password" placeholder="কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড" required style="width: 100%;
+                         margin-bottom: 6px;">পাসওয়ার্ড তৈরি করুন</label>
+                        <input type="password" name="password" autocomplete="new-password" placeholder="কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড" required style="width: 100%;
                          padding: 11px 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: inherit;
                           font-size: 14px; box-sizing: border-box; outline: none;">
                     </div>
@@ -132,11 +146,11 @@
     <!-- JavaScript to toggle between Login & Signup Tabs -->
     <script>
          const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
-            const loginBtn = document.getElementById('tab-login-btn');
-            const signupBtn = document.getElementById('tab-signup-btn');
+         const signupForm = document.getElementById('signup-form');
+         const loginBtn = document.getElementById('tab-login-btn');
+         const signupBtn = document.getElementById('tab-signup-btn');
+         
         function switchTab(tab) {
-
             if (tab === 'login') {
                 loginForm.style.display = 'flex';
                 signupForm.style.display = 'none';
@@ -147,8 +161,7 @@
                 signupBtn.style.borderBottomColor = 'transparent';
                 signupBtn.style.color = '#64748B';
                 signupBtn.style.fontWeight = '600';
-            }
-             else {
+            } else {
                 loginForm.style.display = 'none';
                 signupForm.style.display = 'flex';
                 signupBtn.style.borderBottomColor = '#10B981';
