@@ -33,6 +33,9 @@ urlpatterns = [
     path('study/chapter/<int:subject_id>/', views.study_chapters, name='study_chapters'), 
     path('study/read/<int:chapter_id>/', views.study_read, name='study_read'), 
     path('study/', views.study_classes, name='study_classes'),
+    #
+    path('quiz/all/<int:chapter_id>/', views.chapter_quiz_play, name='chapter_quiz_play'),
+   
 ]
 
 if settings.DEBUG:

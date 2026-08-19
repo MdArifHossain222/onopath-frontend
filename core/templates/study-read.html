@@ -10,15 +10,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'style.css' %}">
     
-    <!-- MathJax for rendering LaTeX math formulas -->
-    <script>
-        window.MathJax = {
-          tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']]
-          }
-        };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+   <script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+    },
+    options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+};
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+    async>
+</script>
 </head>
 <body>
 
@@ -74,7 +81,7 @@
                         <div style="margin-bottom: 25px;">
                             <h3 style="font-size: 18px; color: #0F172A; margin-top: 10px; margin-bottom: 8px; font-weight: 600;">{{ lesson.title }}</h3>
                             <div style="background: #F8FAFC; padding: 18px 20px; border-radius: 8px; border: 1px solid #CBD5E1;">
-                                {{ lesson.content|safe|linebreaks }}
+                                {{ lesson.content|safe }}
                             </div>
                         </div>
                     {% empty %}
@@ -99,6 +106,12 @@
             <div class="footer-quote"><span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
         </footer>
     </div>
-
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+});
+</script>
 </body>
 </html>

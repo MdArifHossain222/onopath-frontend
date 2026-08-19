@@ -41,25 +41,31 @@
         <main class="page-content">
             <div class="page-title">
                 <h2>{{ subject.name }}: অধ্যায় নির্বাচন করুন 📖</h2>
-                <p>যেকোনো অধ্যায়ে ক্লিক করে আজকের দৈনিক কুইজ শুরু করুন।</p>
+                <p>যেকোনো অধ্যায়ের ডেইলি কুইজ অথবা সকল প্রশ্ন একসাথে প্র্যাকটিস করুন।</p>
             </div>
 
             <div class="subject-grid">
                 {% for chapter in chapters %}
                     <div class="subject-card" style="text-align: center; padding: 25px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                         <span style="font-size: 13px; font-weight: 600; color: #2563EB; margin-bottom: 5px;">অধ্যায় ০{{ chapter.chapter_number }}</span>
-                        <h3 style="font-size: 20px; font-weight: 700; color: #0F172A; margin-bottom: 15px;">{{ chapter.name }}</h3>
-                        <a href="{% url 'daily_quiz_play' chapter.id %}" class="btn-card-action" style="display: inline-block;">কুইজ খেলুন 🚀</a>
+                        <h3 style="font-size: 20px; font-weight: 700; color: #0F172A; margin-bottom: 15px;">{{ chapter.title }}</h3>
+                        
+                        <!-- দুটি আলাদা বাটন: ডেইলি কুইজ এবং অল কুইজ -->
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%;">
+                            <a href="{% url 'daily_quiz_play' chapter.id %}" class="btn-card-action" style="background-color: #2563EB; color: white; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600;">⚡ ডেইলি কুইজ</a>
+                            
+                            <a href="{% url 'chapter_quiz_play' chapter.id %}" class="btn-card-action" style="background-color: #10B981; color: white; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600;">📚 সকল প্রশ্ন</a>
+                        </div>
                     </div>
                 {% empty %}
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748B;">
-                        <p>এই বিষয়ে এখনো কোনো অধ্যায় যুক্ত করা হয়নি।</p>
+                        <p>এই বিষয়ে এখনো কোনো অধ্যায় যুক্ত করা হয়নি।</p>
                     </div>
                 {% endfor %}
             </div>
 
             <div style="text-align: center; margin-top: 30px;">
-                <a href="{% url 'quiz_subjects' level=subject.level %}" class="btn-secondary-link">← বিষয়সমূহে ফিরে যান</a>
+                <a href="{% url 'quiz_subjects' level=subject.level %}" class="btn-secondary-link">← বিষয়সমূহে ফিরে যান</a>
             </div>
         </main>
 

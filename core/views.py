@@ -1,21 +1,32 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.contrib.messages import get_messages
-from django.contrib.auth.decorators import login_required
 from datetime import date
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import StudentProfile, Notice, Subject, Chapter, Quiz, Question, Option, UserAnswer
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import ProfileUpdateForm, UserUpdateForm
+from .models import (
+    Chapter,
+    Notice,
+    Option,
+    Question,
+    StudentProfile,
+    Subject,
+    UserAnswer,
+)
+
 
 # ১. হোম ভিউ
 def home(request):
     return render(request, 'index.html')
 
-# ২. অথেন্টিকেশন ভিউ (এটি urls.py-এর ত্রুটি দূর করবে)
+
+# ২. অথেন্টিকেশন ভিউ
 def auth_view(request):
     return render(request, 'auth.html')
+
 
 # ৩. সাইন-আপ লজিক
 def signup_view(request):
@@ -45,6 +56,7 @@ def signup_view(request):
         return redirect('home')
 
     return render(request, 'auth.html')
+
 
 # ৪. লগইন লজিক
 def login_view(request):
@@ -82,11 +94,13 @@ def login_view(request):
 
     return render(request, 'auth.html')
 
+
 # ৫. লগআউট লজিক
 def logout_view(request):
     logout(request)
     messages.info(request, 'আপনি সফলভাবে লগআউট করেছেন।')
     return redirect('home')
+
 
 # ৬. ডাইনামিক প্রোফাইল ভিউ
 @login_required
@@ -94,16 +108,15 @@ def profile(request):
     profile_obj, created = StudentProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
-        # অবতার বা প্রোফাইল ছবি আপলোড হ্যান্ডলিং
         if 'avatar' in request.FILES:
             profile_obj.avatar = request.FILES['avatar']
             profile_obj.save()
-            messages.success(request, 'প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!')
+            messages.success(request, 'প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!')
             return redirect('profile')
 
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile_obj)
-        
+
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
@@ -113,12 +126,11 @@ def profile(request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=profile_obj)
 
-    # ডাইনামিক প্রোগ্রেস ও স্ট্যাটিস্টিক্স কুয়েরি
     user_answers = UserAnswer.objects.filter(user=request.user).order_by('-id')
-    
+
     total_quizzes = user_answers.values('question__quiz').distinct().count()
     correct_answers_count = user_answers.filter(is_correct=True).count()
-    total_points = correct_answers_count * 10  
+    total_points = correct_answers_count * 10
     chapters_completed = user_answers.filter(is_correct=True).values('question__quiz__chapter').distinct().count()
 
     recent_activities = []
@@ -130,7 +142,7 @@ def profile(request):
             if chapter.id not in seen_chapters:
                 seen_chapters.add(chapter.id)
                 recent_activities.append({
-                    'subject_title': subject.title,
+                    'subject_title': subject.name,
                     'chapter_title': chapter.title,
                     'chapter_id': chapter.id,
                 })
@@ -150,6 +162,7 @@ def profile(request):
     }
     return render(request, 'profile.html', context)
 
+
 # ৭. আমাদের কথা (About) ভিউ
 def about(request):
     notices = Notice.objects.all().order_by('-created_at')
@@ -163,11 +176,12 @@ def about(request):
 def quiz_classes_view(request):
     return render(request, 'quiz_classes.html')
 
+
 def quiz_subjects(request, level):
     level = level.upper()
     if level not in ['SSC', 'HSC']:
         level = 'SSC'
-    
+
     subjects = Subject.objects.filter(level=level)
     context = {
         'subjects': subjects,
@@ -175,36 +189,29 @@ def quiz_subjects(request, level):
     }
     return render(request, 'quiz-subjects.html', context)
 
+
 def quiz_chapters(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     chapters = subject.chapters.all().order_by('chapter_number')
     return render(request, 'quiz-chapters.html', {'subject': subject, 'chapters': chapters})
 
-def daily_quiz_play(request, chapter_id):
+
+# ক. অল কুইজ (যেখানে অধ্যায়ের সবগুলো প্রশ্ন একসাথে দেখাবে - লগইন বাধ্যতামূলক)
+def chapter_quiz_play(request, chapter_id):
+    if not request.user.is_authenticated:
+        messages.warning(request, 'সকল প্রশ্ন বা অল কুইজ খেলতে অনুগ্রহ করে প্রথমে লগইন করুন অথবা অ্যাকাউন্ট তৈরি করুন!')
+        return redirect('auth')  # সংশোধন করা হয়েছে ('auth_view' এর পরিবর্তে 'auth')
+
     chapter = get_object_or_404(Chapter, id=chapter_id)
-    
-    today_seed = (date.today() - date(2026, 1, 1)).days
-    
-    all_mcqs = Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id')
-    all_solves = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id')
-    
-    daily_mcqs = []
+
+    daily_mcqs = list(Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id'))
+    all_solves = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id').distinct()
+
+    total_questions_count = len(daily_mcqs)
+
     daily_solve = None
-
-    if all_mcqs.exists():
-        chunk_size = 5
-        total_mcqs = all_mcqs.count()
-        start_index = (today_seed * chunk_size) % total_mcqs
-        end_index = start_index + chunk_size
-        
-        if end_index <= total_mcqs:
-            daily_mcqs = list(all_mcqs[start_index:end_index])
-        else:
-            daily_mcqs = list(all_mcqs[start_index:]) + list(all_mcqs[:end_index % total_mcqs])
-
     if all_solves.exists():
-        solve_index = today_seed % all_solves.count()
-        daily_solve = all_solves[solve_index]
+        daily_solve = all_solves.first()
 
     submitted_qid = None
     selected_option_id = None
@@ -213,27 +220,28 @@ def daily_quiz_play(request, chapter_id):
     if request.method == 'POST':
         question_id = request.POST.get('question_id')
         raw_option_id = request.POST.get('option_id')
-        
+
         if question_id and raw_option_id:
             try:
                 question = Question.objects.get(id=question_id)
                 selected_option = Option.objects.get(id=raw_option_id)
                 is_correct = selected_option.is_correct
-                
+
                 submitted_qid = int(question_id)
                 selected_option_id = int(raw_option_id)
-                
+
                 correct_opt = question.options.filter(is_correct=True).first()
                 if correct_opt:
                     correct_option_id = correct_opt.id
-                
-                if request.user.is_authenticated:
-                    UserAnswer.objects.create(
-                        user=request.user,
-                        question=question,
-                        selected_option=selected_option,
-                        is_correct=is_correct
-                    )
+
+                UserAnswer.objects.update_or_create(
+                    user=request.user,
+                    question=question,
+                    defaults={
+                        'selected_option': selected_option,
+                        'is_correct': is_correct
+                    }
+                )
                 messages.success(request, 'আপনার উত্তর সফলভাবে জমা হয়েছে!')
             except (Question.DoesNotExist, Option.DoesNotExist):
                 messages.error(request, 'ত্রুটি ঘটেছে, আবার চেষ্টা করুন।')
@@ -245,6 +253,87 @@ def daily_quiz_play(request, chapter_id):
         'submitted_qid': submitted_qid,
         'selected_option_id': selected_option_id,
         'correct_option_id': correct_option_id,
+        'has_more_questions': False,
+        'total_questions_count': total_questions_count,
+        'page_title': 'সকল প্রশ্ন (All Quiz)',
+    }
+    return render(request, 'quiz-play.html', context)
+
+
+# খ. ডেইলি কুইজ (যেখানে প্রতিদিন ৫টি করে নতুন প্রশ্ন থাকবে - লগইন ছাড়াই খেলা এবং সাবমিট করা যাবে)
+def daily_quiz_play(request, chapter_id):
+    chapter = get_object_or_404(Chapter, id=chapter_id)
+
+    all_mcqs = list(Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id'))
+    all_solves = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id').distinct()
+
+    total_questions_count = len(all_mcqs)
+    chunk_size = 5  # প্রতিদিনের জন্য ৫টি করে প্রশ্ন
+
+    if total_questions_count <= chunk_size:
+        daily_mcqs = all_mcqs
+    else:
+        today_seed = date.today().toordinal()
+        start_index = (today_seed * chunk_size) % total_questions_count
+        end_index = start_index + chunk_size
+
+        if end_index <= total_questions_count:
+            daily_mcqs = all_mcqs[start_index:end_index]
+        else:
+            daily_mcqs = all_mcqs[start_index:] + all_mcqs[:end_index % total_questions_count]
+
+    daily_solve = None
+    if all_solves.exists():
+        daily_solve = all_solves.first()
+
+    submitted_qid = None
+    selected_option_id = None
+    correct_option_id = None
+
+    if request.method == 'POST':
+        question_id = request.POST.get('question_id')
+        raw_option_id = request.POST.get('option_id')
+
+        if question_id and raw_option_id:
+            try:
+                question = Question.objects.get(id=question_id)
+                selected_option = Option.objects.get(id=raw_option_id)
+                is_correct = selected_option.is_correct
+
+                submitted_qid = int(question_id)
+                selected_option_id = int(raw_option_id)
+
+                correct_opt = question.options.filter(is_correct=True).first()
+                if correct_opt:
+                    correct_option_id = correct_opt.id
+
+                # যদি ইউজার লগইন করা থাকে তবে ডাটাবেসে সেভ হবে, নাহলে গেস্ট হিসেবে সাবমিট ও রেজাল্ট দেখতে পারবে
+                if request.user.is_authenticated:
+                    UserAnswer.objects.update_or_create(
+                        user=request.user,
+                        question=question,
+                        defaults={
+                            'selected_option': selected_option,
+                            'is_correct': is_correct
+                        }
+                    )
+                    messages.success(request, 'আপনার উত্তর সফলভাবে জমা হয়েছে!')
+                else:
+                    messages.info(request, 'উত্তর যাচাই করা হয়েছে। আপনার স্কোর সেভ করতে লগইন করুন!')
+
+            except (Question.DoesNotExist, Option.DoesNotExist):
+                messages.error(request, 'ত্রুটি ঘটেছে, আবার চেষ্টা করুন।')
+
+    context = {
+        'chapter': chapter,
+        'daily_mcqs': daily_mcqs,
+        'daily_solve': daily_solve,
+        'submitted_qid': submitted_qid,
+        'selected_option_id': selected_option_id,
+        'correct_option_id': correct_option_id,
+        'has_more_questions': False,
+        'total_questions_count': total_questions_count,
+        'page_title': 'ডেইলি কুইজ (Daily Quiz)',
     }
     return render(request, 'quiz-play.html', context)
 
@@ -255,11 +344,12 @@ def daily_quiz_play(request, chapter_id):
 def study_classes(request):
     return render(request, 'study-classes.html')
 
+
 def study_subjects(request, level):
     level = level.upper()
     if level not in ['SSC', 'HSC']:
         level = 'SSC'
-    
+
     subjects = Subject.objects.filter(level=level)
     context = {
         'subjects': subjects,
@@ -267,15 +357,17 @@ def study_subjects(request, level):
     }
     return render(request, 'study-subject.html', context)
 
+
 def study_chapters(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     chapters = subject.chapters.all().order_by('chapter_number')
-    return render(request, 'study-chapters.html', {'subject': subject, 'chapters': chapters})
+    return render(request, 'quiz-chapters.html', {'subject': subject, 'chapters': chapters})
+
 
 def study_read(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
     lessons = chapter.lessons.all()
-    
+
     context = {
         'chapter': chapter,
         'lessons': lessons,

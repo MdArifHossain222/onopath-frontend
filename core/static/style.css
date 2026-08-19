@@ -23,18 +23,22 @@ body, html {
     padding: 0 8%;
 }
 
-/* Navbar Style */
+/* Navbar Style (ਸটিকি বা উপরে আটকে থাকার জন্য আপডেট করা হয়েছে) */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 30px;
     margin-top: 20px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 50px;
+    position: sticky;
+    top: 15px; /* স্ক্রোল করার সময় ওপর থেকে সামান্য ফাঁকা রেখে আটকে থাকবে */
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .nav-logo {
@@ -100,7 +104,7 @@ body, html {
 /* কন্টেইনারের ভার্টিক্যাল এলাইনমেন্ট উপরে তোলা */
 .hero-content {
     display: flex;
-    align-items: flex-start; /* center তুলে দিয়ে flex-start দিন যাতে লোগো উপরে উঠে আসে */
+    align-items: flex-start;
     justify-content: space-between;
     margin: 30px auto 20px;
     max-width: 1200px;
@@ -110,16 +114,16 @@ body, html {
 
 /* লোগোর সেকশন ঠিক করা */
 .hero-image {
-    flex: 0 0 280px; /* লোগোর জন্য স্থান নির্দিষ্ট রাখা */
+    flex: 0 0 280px;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* উপরে সারিবদ্ধ করা */
-    margin-top: 10px; /* প্রয়োজন অনুযায়ী একটু উপরে/নিচে সরানোর জন্য */
+    align-items: flex-start;
+    margin-top: 10px;
 }
 
 /* লোগো ছোট করা */
 .hero-image img {
-    width: 220px; /* লোগোর সাইজ ছোট করে ২২০px করা হলো */
+    width: 220px;
     max-width: 100%;
     height: auto;
 }
@@ -262,10 +266,12 @@ body, html {
         flex-direction: column;
         gap: 12px;
         border-radius: 20px;
+        position: relative; /* মোবাইলে স্টিকি অফ রেখে নরমাল ফ্লো রাখা ভালো হতে পারে, প্রয়োজনে রাখতে পারেন */
+        top: 0;
     }
 
     .nav-links {
-        gap: 15px;
+        display: none;
     }
 
     .hero-text h1 {
@@ -283,11 +289,7 @@ body, html {
     }
 }
 
-
-
-
 /* Part_2*/
-/* Page Area Compact */
 .page-content {
     margin: 20px auto 10px;
     max-width: 850px;
@@ -311,7 +313,6 @@ body, html {
     margin-top: 4px;
 }
 
-/* Subject Grid Layout - Compact & Slim */
 .subject-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -361,7 +362,6 @@ body, html {
     line-height: 1.4;
 }
 
-/* Universal Button Style for Subject Cards */
 .btn-card-action {
     display: inline-block;
     align-self: flex-start;
@@ -380,10 +380,9 @@ body, html {
     transform: scale(1.02);
 }
 
-/* for quiz-play,html*/
-/* Quiz Play Page Styling - Wide & Compact */
+/* Quiz Play Page Styling */
 .quiz-play-container {
-    max-width: 920px; /* দুই পাশে চওড়া বাড়ানো হলো */
+    max-width: 920px;
     margin: 15px auto 10px;
     padding: 0 15px;
     width: 100%;
@@ -395,7 +394,7 @@ body, html {
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.9);
     border-radius: 16px;
-    padding: 20px 28px; /* উপর-নিচে প্যাডিং কমানো হয়েছে */
+    padding: 20px 28px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
@@ -429,10 +428,9 @@ body, html {
     font-weight: 600;
 }
 
-/* 2-Column Grid Layout for Options (Vertical Height Reduction) */
 .quiz-options-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* চারটা অপশনকে ২ কলামে ভাগ করে সাইড-বাই-সাইড করা হয়েছে */
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px 14px;
     margin-bottom: 16px;
 }
@@ -442,7 +440,7 @@ body, html {
     text-align: left;
     background: rgba(255, 255, 255, 0.85);
     border: 1px solid #CBD5E1;
-    padding: 10px 14px; /* বাটন প্যাডিং ছোট করা হয়েছে */
+    padding: 10px 14px;
     border-radius: 8px;
     font-size: 14px;
     color: #1E293B;
@@ -463,7 +461,6 @@ body, html {
     font-weight: 600;
 }
 
-/* Action Button */
 .quiz-footer-action {
     margin-bottom: 14px;
 }
@@ -484,7 +481,6 @@ body, html {
     background: #047857;
 }
 
-/* Explanation Box */
 .quiz-explanation {
     background: #F8FAFC;
     border-left: 4px solid #064E3B;
@@ -501,23 +497,18 @@ body, html {
     font-size: 14px;
 }
 
-/* ==========================================
-   Mobile Responsive Styles (768px or smaller) for index.html page
-   ========================================== */
 @media screen and (max-width: 768px) {
-    /* ১. নেভিগেশন বার রেসপনসিভ */
     .navbar {
         padding: 12px 20px;
         flex-wrap: wrap;
     }
 
     .nav-links {
-        display: none; /* মোবাইলে মেনু হাইড করার জন্য (পরে হ্যামবার্গার মেনু যোগ করতে পারেন) */
+        display: none;
     }
 
-    /* ২. হিরো সেকশনকে ১-কলামে নামিয়ে আনা */
     .hero-content {
-        flex-direction: column-reverse; /* লোগো উপরে এবং টেক্সট নিচে আনার জন্য */
+        flex-direction: column-reverse;
         padding: 20px;
         margin: 20px auto;
         gap: 25px;
@@ -529,7 +520,7 @@ body, html {
     }
 
     .hero-text h1 {
-        font-size: 32px; /* মোবাইলের জন্য ছোট হেডিং */
+        font-size: 32px;
         line-height: 1.3;
     }
 
@@ -540,8 +531,8 @@ body, html {
     }
 
     .cta-group {
-        justify-content: center; /* মোবাইলে বাটন মাঝে থাকবে */
-        flex-direction: column; /* বাটন দুটি একটার নিচে একটা আসবে */
+        justify-content: center;
+        flex-direction: column;
         width: 100%;
         gap: 10px;
     }
@@ -552,19 +543,17 @@ body, html {
         box-sizing: border-box;
     }
 
-    /* ৩. লোগো রেসপনসিভ */
     .hero-image {
         flex: 0 0 auto;
         width: 100%;
     }
 
     .hero-image img {
-        width: 160px; /* মোবাইলে লোগো সাইজ */
+        width: 160px;
     }
 
-    /* ৪. ফিচার কার্ড গ্রিড রেসপনসিভ */
     .features-grid {
-        grid-template-columns: 1fr; /* মোবাইলে ৩টি কার্ড পর পর নিচে নিচে আসবে */
+        grid-template-columns: 1fr;
         gap: 15px;
     }
 
@@ -572,14 +561,13 @@ body, html {
         padding: 0 20px;
     }
 }
-/* কুইজ অপশন লেভেলের বেসিক ডিজাইন ও লেআউট */
+
 .quiz-options-grid label.quiz-opt-btn {
     display: block;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-/* সাবমিট করার পর সঠিক উত্তর (সবুজ রঙ) */
 .quiz-options-grid label.quiz-opt-btn.correct-opt {
     background-color: #d1e7dd !important;
     border-color: #badbcc !important;
@@ -587,7 +575,6 @@ body, html {
     font-weight: bold !important;
 }
 
-/* সাবমিট করার পর ভুল উত্তর (লাল রঙ) */
 .quiz-options-grid label.quiz-opt-btn.wrong-opt {
     background-color: #f8d7da !important;
     border-color: #f5c2c7 !important;

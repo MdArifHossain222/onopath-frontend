@@ -1,29 +1,41 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import StudentProfile, Notice, Subject, Chapter, Lesson,Quiz, Question, Option
-from .models import UserAnswer
+from .models import StudentProfile, Notice, Subject, Chapter, Lesson, Quiz, Question, Option, UserAnswer
 
 # Profile-কে User-এর ভেতরে ইনলাইন হিসেবে দেখানোর জন্য
 class StudentProfileInline(admin.StackedInline):
     model = StudentProfile
+    can_can_delete = False  # can_delete বানান ঠিক করা হলো
     can_delete = False
 
 # UserAdmin কাস্টমাইজেশন
 class UserAdmin(BaseUserAdmin):
     inlines = (StudentProfileInline,)
 
-# ডিফল্ট User unregister করে কাস্টম Inline সহ পুনরায় register
+# ডিফল্ট User unregister করে কাস্টম Inline সহ পুনরায় register
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
-# শুধু কনটেন্ট সম্পর্কিত মডেলগুলো CORE-এ থাকবে
+# ==========================================
+# কুইজ অপশনকে প্রশ্নের ভেতরে দেখানোর জন্য Inline কনফিগারেশন
+# ==========================================
+class OptionInline(admin.TabularInline):
+    model = Option
+    extra = 4  # একসাথে ৪টি অপশনের ঘর দেখাবে
+
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [OptionInline]
+    list_display = ('id', 'text', 'quiz', 'question_type') # অ্যাডমিন লিস্টে সুন্দর দেখানোর জন্য
+    search_fields = ('question_text',)
+
+# সাধারণ মডেলগুলো রেজিস্টার
 admin.site.register(Notice)
 admin.site.register(Subject)
 admin.site.register(Chapter)
 admin.site.register(Lesson)
-# কুইজ মডেলগুলো এখানে রেজিস্টার করুন
 admin.site.register(Quiz)
-admin.site.register(Question)
-admin.site.register(Option)
+
+# Question-কে কাস্টম Admin সহ রেজিস্টার করা হলো (Option আলাদা রেজিস্টার হবে না)
+admin.site.register(Question, QuestionAdmin)
 admin.site.register(UserAnswer)

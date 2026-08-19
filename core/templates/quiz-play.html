@@ -62,7 +62,8 @@
             
             {% if daily_mcqs %}
                 {% for q in daily_mcqs %}
-                <div class="quiz-play-card" style="margin-bottom: 30px;">
+                <!-- প্রতিটি কার্ডের একটি ডায়নামিক আইডি যাতে সাবমিট করার পর স্ক্রোল করে ঠিক এখানেই ফোকাস থাকে -->
+                <div class="quiz-play-card" id="question-{{ q.id }}" style="margin-bottom: 30px;">
                     
                     <!-- Top Info Bar -->
                     <div class="quiz-card-header">
@@ -70,8 +71,8 @@
                         <span class="quiz-step-count">প্রশ্ন {{ forloop.counter }}</span>
                     </div>
 
-                    <!-- প্রতিটি প্রশ্ন এখন আলাদা আলাদা ফর্মের ভেতরে থাকবে -->
-                    <form method="POST">
+                    <!-- প্রতিটি প্রশ্ন এখন আলাদা আলাদা ফর্মের ভেতরে থাকবে এবং সাবমিটের পর হ্যাশ ট্যাগ যুক্ত থাকবে -->
+                    <form method="POST" action="#question-{{ q.id }}">
                         {% csrf_token %}
                         <input type="hidden" name="question_id" value="{{ q.id }}">
                         
@@ -90,7 +91,7 @@
                             {% endfor %}
                         </div>
 
-                        <!-- Action Button: উত্তর জমা দেওয়ার আগে দেখাবে, এই নির্দিষ্ট প্রশ্ন জমা হলে লুকিয়ে যাবে -->
+                        <!-- Action Button: উত্তর জমা দেওয়ার আগে দেখাবে -->
                         {% if submitted_qid != q.id %}
                         <div class="quiz-footer-action">
                             <button type="submit" class="btn-submit-quiz">উত্তর জমা দিন 📩</button>
@@ -98,7 +99,7 @@
                         {% endif %}
                     </form>
 
-                    <!-- Explanation Section: এটি কেবল এই প্রশ্নটি সাবমিট করার পরেই শো করবে -->
+                    <!-- Explanation Section -->
                     {% if submitted_qid == q.id and q.explanation %}
                     <div class="quiz-explanation" style="margin-top: 20px; display: block;">
                         <h4>💡 ব্যাখ্যা:</h4>
@@ -109,8 +110,22 @@
                 </div>
                 {% endfor %}
 
+                <!-- লগইন করা না থাকলে এবং মোট প্রশ্ন ৫টির বেশি হলে নোটিশ বক্স দেখাবে -->
+                {% if not user.is_authenticated and total_questions_count > 5 %}
+                <div class="quiz-play-card" style="text-align: center; background: #fdf8e2; border: 2px dashed #f0ad4e; padding: 30px; margin-top: 30px; border-radius: 12px;">
+                    <h3 style="color: #8a6d3b; margin-bottom: 10px;">🔒 আরও কুইজ বাকি আছে!</h3>
+                    <p style="color: #555; font-size: 16px; margin-bottom: 20px;">
+                        এই অধ্যায়ে আরও অনেক গুরুত্বপূর্ণ প্রশ্ন রয়েছে। পরবর্তী কুইজগুলোতে অংশ নিতে এবং আপনার অগ্রগতি ট্র্যাক করতে দ্রুত লগইন বা অ্যাকাউন্ট তৈরি করুন।
+                    </p>
+                    <div>
+                        <a href="{% url 'auth' %}" style="background: #2b7a78; color: white; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-right: 10px; display: inline-block;">লগইন করুন</a>
+                        <a href="{% url 'auth' %}" style="background: #3aafa9; color: white; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">অ্যাকাউন্ট তৈরি করুন</a>
+                    </div>
+                </div>
+                {% endif %}
+
             {% else %}
-                <!-- Static Fallback Template (যদি ডাটাবেজে প্রশ্ন যুক্ত করা না থাকে) -->
+                <!-- Static Fallback Template -->
                 <div class="quiz-play-card">
                     <div class="quiz-card-header">
                         <span class="quiz-subject-tag">⚡ পদার্থবিজ্ঞান: গতি ও বল</span>
@@ -148,6 +163,18 @@
             <div class="footer-quote"><span>🌱</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
         </footer>
     </div>
+
+    <!-- JavaScript: সাবমিট করার পর পেজ রিলোড হলে স্ক্রোল ফিক্স রাখার জন্য -->
+    {% if submitted_qid %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var element = document.getElementById("question-{{ submitted_qid }}");
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+    {% endif %}
 
 </body>
 </html>
