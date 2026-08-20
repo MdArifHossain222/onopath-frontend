@@ -196,22 +196,15 @@ def quiz_chapters(request, subject_id):
     return render(request, 'quiz-chapters.html', {'subject': subject, 'chapters': chapters})
 
 
-# ক. অল কুইজ (যেখানে অধ্যায়ের সবগুলো প্রশ্ন একসাথে দেখাবে - লগইন বাধ্যতামূলক)
+# ক. অল কুইজ (সকল প্রশ্ন - লগইন বাধ্যতামূলক)
 def chapter_quiz_play(request, chapter_id):
     if not request.user.is_authenticated:
         messages.warning(request, 'সকল প্রশ্ন বা অল কুইজ খেলতে অনুগ্রহ করে প্রথমে লগইন করুন অথবা অ্যাকাউন্ট তৈরি করুন!')
-        return redirect('auth')  # সংশোধন করা হয়েছে ('auth_view' এর পরিবর্তে 'auth')
+        return redirect('auth')
 
     chapter = get_object_or_404(Chapter, id=chapter_id)
-
     daily_mcqs = list(Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id'))
-    all_solves = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id').distinct()
-
     total_questions_count = len(daily_mcqs)
-
-    daily_solve = None
-    if all_solves.exists():
-        daily_solve = all_solves.first()
 
     submitted_qid = None
     selected_option_id = None
@@ -249,26 +242,23 @@ def chapter_quiz_play(request, chapter_id):
     context = {
         'chapter': chapter,
         'daily_mcqs': daily_mcqs,
-        'daily_solve': daily_solve,
+        'daily_solve': None,
         'submitted_qid': submitted_qid,
         'selected_option_id': selected_option_id,
         'correct_option_id': correct_option_id,
         'has_more_questions': False,
         'total_questions_count': total_questions_count,
-        'page_title': 'সকল প্রশ্ন (All Quiz)',
+        'page_title': 'সকল কুইজ (All Quiz)',
     }
     return render(request, 'quiz-play.html', context)
 
 
-# খ. ডেইলি কুইজ (যেখানে প্রতিদিন ৫টি করে নতুন প্রশ্ন থাকবে - লগইন ছাড়াই খেলা এবং সাবমিট করা যাবে)
+# খ. ডেইলি কুইজ (প্রতিদিন ৫টি প্রশ্ন - লগইন ছাড়া খেলা যাবে)
 def daily_quiz_play(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
-
     all_mcqs = list(Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id'))
-    all_solves = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id').distinct()
-
     total_questions_count = len(all_mcqs)
-    chunk_size = 5  # প্রতিদিনের জন্য ৫টি করে প্রশ্ন
+    chunk_size = 5  
 
     if total_questions_count <= chunk_size:
         daily_mcqs = all_mcqs
@@ -281,10 +271,6 @@ def daily_quiz_play(request, chapter_id):
             daily_mcqs = all_mcqs[start_index:end_index]
         else:
             daily_mcqs = all_mcqs[start_index:] + all_mcqs[:end_index % total_questions_count]
-
-    daily_solve = None
-    if all_solves.exists():
-        daily_solve = all_solves.first()
 
     submitted_qid = None
     selected_option_id = None
@@ -307,7 +293,6 @@ def daily_quiz_play(request, chapter_id):
                 if correct_opt:
                     correct_option_id = correct_opt.id
 
-                # যদি ইউজার লগইন করা থাকে তবে ডাটাবেসে সেভ হবে, নাহলে গেস্ট হিসেবে সাবমিট ও রেজাল্ট দেখতে পারবে
                 if request.user.is_authenticated:
                     UserAnswer.objects.update_or_create(
                         user=request.user,
@@ -327,7 +312,7 @@ def daily_quiz_play(request, chapter_id):
     context = {
         'chapter': chapter,
         'daily_mcqs': daily_mcqs,
-        'daily_solve': daily_solve,
+        'daily_solve': None,
         'submitted_qid': submitted_qid,
         'selected_option_id': selected_option_id,
         'correct_option_id': correct_option_id,
@@ -338,8 +323,21 @@ def daily_quiz_play(request, chapter_id):
     return render(request, 'quiz-play.html', context)
 
 
+# গ. সলভ কোশ্চেন ভিউ (নতুন যোগ করা হয়েছে)
+def chapter_solve_view(request, chapter_id):
+    chapter = get_object_or_404(Chapter, id=chapter_id)
+    solve_questions = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id')
+
+    context = {
+        'chapter': chapter,
+        'solve_questions': solve_questions,
+        'page_title': 'সলভ কোশ্চেন (Solve Questions)',
+    }
+    return render(request, 'chapter-solve.html', context)
+
+
 # ==========================================
-# স্টাডি সেকশন ভিউসমূহ
+# স্টাডি সেকশন ভিউসমূহ (সংশোধিত)
 # ==========================================
 def study_classes(request):
     return render(request, 'study-classes.html')
@@ -361,7 +359,8 @@ def study_subjects(request, level):
 def study_chapters(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     chapters = subject.chapters.all().order_by('chapter_number')
-    return render(request, 'quiz-chapters.html', {'subject': subject, 'chapters': chapters})
+    # এখানে কুইজ টেমপ্লেটের পরিবর্তে সঠিক স্টাডি চ্যাপ্টার টেমপ্লেট রেন্ডার করা হয়েছে
+    return render(request, 'study-chapters.html', {'subject': subject, 'chapters': chapters})
 
 
 def study_read(request, chapter_id):

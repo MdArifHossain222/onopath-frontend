@@ -501,6 +501,14 @@ body, html {
     .navbar {
         padding: 12px 20px;
         flex-wrap: wrap;
+    position: sticky;   /* অথবা position: fixed; ব্যবহার করতে পারেন */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;      /* যাতে লেখার নিচে চলে না যায়, সবসময় উপরে থাকে */
+    background-color: #ffffff; /* ব্যাকগ্রাউন্ড সাদা রাখা জরুরি, নাহলে পেছনের লেখা দেখা যাবে */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* সুন্দর একটি শ্যাডো ইফেক্ট */
+
     }
 
     .nav-links {
