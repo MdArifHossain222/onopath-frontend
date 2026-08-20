@@ -253,7 +253,7 @@ def chapter_quiz_play(request, chapter_id):
     return render(request, 'quiz-play.html', context)
 
 
-# খ. ডেইলি কুইজ (প্রতিদিন ৫টি প্রশ্ন - লগইন ছাড়া খেলা যাবে)
+# খ. ডেইলি কুইজ (প্রতিদিন ৫টি প্রশ্ন - লগইন ছাড়া খেলা যাবে)
 def daily_quiz_play(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
     all_mcqs = list(Question.objects.filter(quiz__chapter=chapter, question_type='mcq').order_by('id'))
@@ -294,18 +294,23 @@ def daily_quiz_play(request, chapter_id):
                     correct_option_id = correct_opt.id
 
                 if request.user.is_authenticated:
-                    UserAnswer.objects.update_or_create(
-                        user=request.user,
-                        question=question,
-                        defaults={
-                            'selected_option': selected_option,
-                            'is_correct': is_correct
-                        }
-                    )
+                    user_answers = UserAnswer.objects.filter(user=request.user, question=question)
+                    if user_answers.exists():
+                        user_answer = user_answers.first()
+                        user_answer.selected_option = selected_option
+                        user_answer.is_correct = is_correct
+                        user_answer.save()
+                        user_answers.exclude(pk=user_answer.pk).delete()
+                    else:
+                        UserAnswer.objects.create(
+                            user=request.user,
+                            question=question,
+                            selected_option=selected_option,
+                            is_correct=is_correct
+                        )
                     messages.success(request, 'আপনার উত্তর সফলভাবে জমা হয়েছে!')
                 else:
                     messages.info(request, 'উত্তর যাচাই করা হয়েছে। আপনার স্কোর সেভ করতে লগইন করুন!')
-
             except (Question.DoesNotExist, Option.DoesNotExist):
                 messages.error(request, 'ত্রুটি ঘটেছে, আবার চেষ্টা করুন।')
 
@@ -323,7 +328,7 @@ def daily_quiz_play(request, chapter_id):
     return render(request, 'quiz-play.html', context)
 
 
-# গ. সলভ কোশ্চেন ভিউ (নতুন যোগ করা হয়েছে)
+# গ. সলভ কোশ্চেন ভিউ
 def chapter_solve_view(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
     solve_questions = Question.objects.filter(quiz__chapter=chapter, question_type='solve').order_by('id')
@@ -337,7 +342,7 @@ def chapter_solve_view(request, chapter_id):
 
 
 # ==========================================
-# স্টাডি সেকশন ভিউসমূহ (সংশোধিত)
+# স্টাডি সেকশন ভিউসমূহ
 # ==========================================
 def study_classes(request):
     return render(request, 'study-classes.html')
@@ -359,7 +364,6 @@ def study_subjects(request, level):
 def study_chapters(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     chapters = subject.chapters.all().order_by('chapter_number')
-    # এখানে কুইজ টেমপ্লেটের পরিবর্তে সঠিক স্টাডি চ্যাপ্টার টেমপ্লেট রেন্ডার করা হয়েছে
     return render(request, 'study-chapters.html', {'subject': subject, 'chapters': chapters})
 
 
