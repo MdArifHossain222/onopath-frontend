@@ -46,8 +46,8 @@
 
             <div class="subject-grid">
                 {% for subject in subjects %}
-                    <div class="subject-card" style="text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <h3 style="font-size: 24px; font-weight: 700; color: #0F172A; margin-bottom: 10px;">{{ subject.name }}</h3>
+                    <div class="subject-card" style="text-align: center; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <h3 style="font-size: 15px; font-weight: 700; color: #0F172A; margin-bottom: 7px;">{{ subject.name }}</h3>
                         <p style="margin-bottom: 20px; color: #475569; font-size: 14px;">{{ level }} লেভেলের কুইজ টেস্ট</p>
                         <a href="{% url 'quiz_chapters' subject.id %}" class="btn-card-action" style="display: inline-block;">অধ্যায়গুলো দেখুন 🎯</a>
                     </div>

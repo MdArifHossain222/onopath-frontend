@@ -227,6 +227,7 @@ def chapter_quiz_play(request, chapter_id):
                 if correct_opt:
                     correct_option_id = correct_opt.id
 
+                # এখানে .get() এর বদলে update_or_create ব্যবহার করা হয়েছে যেন MultipleObjectsReturned এরর না আসে
                 UserAnswer.objects.update_or_create(
                     user=request.user,
                     question=question,
@@ -251,7 +252,6 @@ def chapter_quiz_play(request, chapter_id):
         'page_title': 'সকল কুইজ (All Quiz)',
     }
     return render(request, 'quiz-play.html', context)
-
 
 # খ. ডেইলি কুইজ (প্রতিদিন ৫টি প্রশ্ন - লগইন ছাড়া খেলা যাবে)
 def daily_quiz_play(request, chapter_id):
@@ -294,23 +294,19 @@ def daily_quiz_play(request, chapter_id):
                     correct_option_id = correct_opt.id
 
                 if request.user.is_authenticated:
-                    user_answers = UserAnswer.objects.filter(user=request.user, question=question)
-                    if user_answers.exists():
-                        user_answer = user_answers.first()
-                        user_answer.selected_option = selected_option
-                        user_answer.is_correct = is_correct
-                        user_answer.save()
-                        user_answers.exclude(pk=user_answer.pk).delete()
-                    else:
-                        UserAnswer.objects.create(
-                            user=request.user,
-                            question=question,
-                            selected_option=selected_option,
-                            is_correct=is_correct
-                        )
+                    # update_or_create ব্যবহার করার ফলে MultipleObjectsReturned এরর আসার কোনো সুযোগ নেই
+                    user_answer, created = UserAnswer.objects.update_or_create(
+                        user=request.user,
+                        question=question,
+                        defaults={
+                            'selected_option': selected_option,
+                            'is_correct': is_correct
+                        }
+                    )
                     messages.success(request, 'আপনার উত্তর সফলভাবে জমা হয়েছে!')
                 else:
                     messages.info(request, 'উত্তর যাচাই করা হয়েছে। আপনার স্কোর সেভ করতে লগইন করুন!')
+
             except (Question.DoesNotExist, Option.DoesNotExist):
                 messages.error(request, 'ত্রুটি ঘটেছে, আবার চেষ্টা করুন।')
 
@@ -326,7 +322,6 @@ def daily_quiz_play(request, chapter_id):
         'page_title': 'ডেইলি কুইজ (Daily Quiz)',
     }
     return render(request, 'quiz-play.html', context)
-
 
 # গ. সলভ কোশ্চেন ভিউ
 def chapter_solve_view(request, chapter_id):
@@ -376,3 +371,21 @@ def study_read(request, chapter_id):
         'lessons': lessons,
     }
     return render(request, 'study-read.html', context)
+
+
+
+from django.http import JsonResponse
+
+def study_read_json(request, chapter_id):
+    chapter = get_object_or_404(Chapter, id=chapter_id)
+    lessons = chapter.lessons.all() # অথবা আপনার লেসন রিলেশন যেভাবে আছে
+    
+    lessons_data = []
+    for lesson in lessons:
+        lessons_data.append({
+            'id': lesson.id,
+            'title': lesson.title,
+            'content': lesson.content, # সেফ এইচটিএমএল কনটেন্ট
+        })
+        
+    return JsonResponse({'lessons': lessons_data})

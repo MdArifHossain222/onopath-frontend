@@ -48,14 +48,17 @@ class Chapter(models.Model):
         return f"{self.subject.name} - {self.title}"
 
 
-# ৩. অধ্যায়ের পড়া/নotes
 class Lesson(models.Model):
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='lessons')
-    title = models.CharField(max_length=200, blank=True, null=True, verbose_name="লেসনের শিরোনাম")
-    content = models.TextField(verbose_name="লেসন কনটেন্ট")
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    order = models.PositiveIntegerField(default=1)  # সিরিয়াল বা ক্রমিক নম্বর দেওয়ার জন্য
+
+    class Meta:
+        ordering = ['order']  # ডিফল্টভাবে অর্ডারের ক্রমানুসারে সাজাবে
 
     def __str__(self):
-        return f"Lesson: {self.title or self.chapter.title}"
+        return f"{self.title}"
 
 
 # ৪. কুইজ মডেল (অধ্যায়ভিত্তিক)

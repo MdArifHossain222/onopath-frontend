@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_browser_reload',  # যুক্ত করা হয়েছে
     'core',
 ]
 
@@ -36,6 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_browser_reload.middleware.BrowserReloadMiddleware',  # যুক্ত করা হয়েছে
 ]
 
 ROOT_URLCONF = 'onopath_backend.urls'
@@ -111,6 +113,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = 'profile'
 
 # Email Configuration (পাসওয়ার্ড রিসেটের জন্য ইমেইল সেটিংস)
-# বর্তমানে এটি কনসোল ব্যাকএন্ডে সেট করা আছে, যাতে লোকাল টেস্ট করার সময় ইমেইল সরাসরি আপনার টার্মিনালে বা কনসোলে দেখা যায়।
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'support@onopath.com'

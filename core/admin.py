@@ -6,7 +6,6 @@ from .models import StudentProfile, Notice, Subject, Chapter, Lesson, Quiz, Ques
 # Profile-কে User-এর ভেতরে ইনলাইন হিসেবে দেখানোর জন্য
 class StudentProfileInline(admin.StackedInline):
     model = StudentProfile
-    can_can_delete = False  # can_delete বানান ঠিক করা হলো
     can_delete = False
 
 # UserAdmin কাস্টমাইজেশন
@@ -29,11 +28,19 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = ('id', 'text', 'quiz', 'question_type') # অ্যাডমিন লিস্টে সুন্দর দেখানোর জন্য
     search_fields = ('question_text',)
 
+# ==========================================
+# Lesson-এর জন্য কাস্টম অ্যাডমিন ও ফিল্টার কনফিগারেশন
+# ==========================================
+class LessonAdmin(admin.ModelAdmin):
+    list_display = ('title', 'chapter')  # তালিকায় লেসন ও চ্যাপ্টার দেখাবে
+    list_filter = ('chapter',)           # ডানপাশে চ্যাপ্টার অনুযায়ী ফিল্টার করার অপশন থাকবে
+    search_fields = ('title',)           # সার্চ বক্স থাকবে
+
 # সাধারণ মডেলগুলো রেজিস্টার
 admin.site.register(Notice)
 admin.site.register(Subject)
 admin.site.register(Chapter)
-admin.site.register(Lesson)
+admin.site.register(Lesson, LessonAdmin)  # Lesson-কে কাস্টম ফিল্টার সহ রেজিস্টার করা হলো
 admin.site.register(Quiz)
 
 # Question-কে কাস্টম Admin সহ রেজিস্টার করা হলো (Option আলাদা রেজিস্টার হবে না)
