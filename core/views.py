@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
 
 from .forms import ProfileUpdateForm, UserUpdateForm
 from .models import (
@@ -227,7 +228,6 @@ def chapter_quiz_play(request, chapter_id):
                 if correct_opt:
                     correct_option_id = correct_opt.id
 
-                # এখানে .get() এর বদলে update_or_create ব্যবহার করা হয়েছে যেন MultipleObjectsReturned এরর না আসে
                 UserAnswer.objects.update_or_create(
                     user=request.user,
                     question=question,
@@ -252,6 +252,7 @@ def chapter_quiz_play(request, chapter_id):
         'page_title': 'সকল কুইজ (All Quiz)',
     }
     return render(request, 'quiz-play.html', context)
+
 
 # খ. ডেইলি কুইজ (প্রতিদিন ৫টি প্রশ্ন - লগইন ছাড়া খেলা যাবে)
 def daily_quiz_play(request, chapter_id):
@@ -294,8 +295,7 @@ def daily_quiz_play(request, chapter_id):
                     correct_option_id = correct_opt.id
 
                 if request.user.is_authenticated:
-                    # update_or_create ব্যবহার করার ফলে MultipleObjectsReturned এরর আসার কোনো সুযোগ নেই
-                    user_answer, created = UserAnswer.objects.update_or_create(
+                    UserAnswer.objects.update_or_create(
                         user=request.user,
                         question=question,
                         defaults={
@@ -323,6 +323,7 @@ def daily_quiz_play(request, chapter_id):
     }
     return render(request, 'quiz-play.html', context)
 
+
 # গ. সলভ কোশ্চেন ভিউ
 def chapter_solve_view(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
@@ -336,13 +337,11 @@ def chapter_solve_view(request, chapter_id):
     return render(request, 'chapter-solve.html', context)
 
 
-# ==========================================
-# স্টাডি সেকশন ভিউসমূহ
-# ==========================================
+# স্টাডি ক্লাস পেজ (লগইন ছাড়াই দেখা যাবে)
 def study_classes(request):
     return render(request, 'study-classes.html')
 
-
+# স্টাডি সাবজেক্ট পেজ - এখানে লগইন লাগবে না, সবাই সাবজেক্টগুলো দেখতে পারবে
 def study_subjects(request, level):
     level = level.upper()
     if level not in ['SSC', 'HSC']:
@@ -355,13 +354,15 @@ def study_subjects(request, level):
     }
     return render(request, 'study-subject.html', context)
 
-
+# চ্যাপ্টার লিস্ট দেখার সময় লগইন বাধ্যতামূলক
+@login_required
 def study_chapters(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     chapters = subject.chapters.all().order_by('chapter_number')
     return render(request, 'study-chapters.html', {'subject': subject, 'chapters': chapters})
 
-
+# লেসন পড়ার সময় লগইন বাধ্যতামূলক
+@login_required
 def study_read(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
     lessons = chapter.lessons.all()
@@ -372,20 +373,17 @@ def study_read(request, chapter_id):
     }
     return render(request, 'study-read.html', context)
 
-
-
-from django.http import JsonResponse
-
+@login_required
 def study_read_json(request, chapter_id):
     chapter = get_object_or_404(Chapter, id=chapter_id)
-    lessons = chapter.lessons.all() # অথবা আপনার লেসন রিলেশন যেভাবে আছে
+    lessons = chapter.lessons.all()
     
     lessons_data = []
     for lesson in lessons:
         lessons_data.append({
             'id': lesson.id,
             'title': lesson.title,
-            'content': lesson.content, # সেফ এইচটিএমএল কনটেন্ট
+            'content': lesson.content,
         })
         
     return JsonResponse({'lessons': lessons_data})

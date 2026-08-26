@@ -78,7 +78,7 @@
                         
                         <!-- Question Text -->
                         <h3 class="quiz-question">
-                            {{ forloop.counter }}. {{ q.text }}
+                           {{ forloop.counter }}. {{ q.text|safe }}
                         </h3>
 
                         <!-- Options List -->
@@ -170,11 +170,36 @@
         document.addEventListener("DOMContentLoaded", function() {
             var element = document.getElementById("question-{{ submitted_qid }}");
             if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.scrollIntoView({ behavior: 'auto', block: 'center' });
             }
         });
     </script>
     {% endif %}
 
+    <!-- ভাসমান লাইভ সিঙ্ক বাটন -->
+<button onclick="syncQuizContent()" id="sync-btn" style="position: fixed; top: 10px; left: 20px; background: #0284c7; color: white; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 8px; font-family: 'Hind Siliguri', sans-serif; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 99999; transition: all 0.3s ease;">
+    🔄 লাইভ সিঙ্ক
+</button>
+
+<script>
+    // পেজ লোড হলে MathJax রেন্ডার করা
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
+    });
+
+    // কুইজ পেজের জন্য লাইভ সিঙ্ক বা রিফ্রেশ ফাংশন
+    function syncQuizContent() {
+        let btn = document.getElementById('sync-btn');
+        btn.innerText = "আপডেট হচ্ছে...";
+        btn.style.background = "#64748B";
+
+        // পেজটি রিফ্রেশ করে সার্ভার থেকে লেটেস্ট কুইজ ডাটা নিয়ে আসা
+        setTimeout(() => {
+            location.reload();
+        }, 500);
+    }
+</script>
 </body>
 </html>

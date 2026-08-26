@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_browser_reload',  # যুক্ত করা হয়েছে
     'core',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -115,3 +116,4 @@ LOGIN_REDIRECT_URL = 'profile'
 # Email Configuration (পাসওয়ার্ড রিসেটের জন্য ইমেইল সেটিংস)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'support@onopath.com'
+LOGIN_URL = '/auth/'

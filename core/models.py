@@ -83,6 +83,13 @@ class Question(models.Model):
     question_type = models.CharField(max_length=10, choices=QUESTION_TYPES, default='mcq', verbose_name="প্রশ্নের ধরন")
     explanation = models.TextField(blank=True, verbose_name="ব্যাখ্যা / সলভ")
     order_number = models.IntegerField(default=1, verbose_name="লুপ সিরিয়াল নম্বর")
+    serial_number = models.PositiveIntegerField(default=1, verbose_name="ক্রমিক নম্বর")
+    
+    solution_text = models.TextField(blank=True, null=True)
+    loop_serial = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        ordering = ['serial_number']
 
     def __str__(self):
         return f"[{self.get_question_type_display()}] {self.text[:50]}"

@@ -45,9 +45,9 @@
             </div>
 
             <!-- শ্রেণি সিলেক্ট করার কার্ড বা বাটনগুলো -->
-            <div class="subject-grid">
+            <div class="subject-grid" style="display: flex; justify-content: center;">
                 <!-- SSC Quiz Card -->
-                <div class="subject-card" style="text-align: center; padding: 35px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div class="subject-card" style="text-align: center; padding: 35px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 350px; width: 100%;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;">
                         <span style="font-size: 30px; line-height: 1;">🏫</span>
                         <h3 style="font-size: 28px; font-weight: 700; color: #0F172A; margin: 0; line-height: 1;">SSC</h3>
@@ -56,7 +56,8 @@
                     <a href="{% url 'quiz_subjects' 'ssc' %}" class="btn-card-action" style="display: inline-block;">কুইজ শুরু করুন 🚀</a>
                 </div>
 
-                <!-- HSC Quiz Card -->
+                <!-- HSC Quiz Card (আপাতਤ কমেন্টআউট করে রাখা হলো, পরবর্তীতে প্রয়োজন হলে আনকমেন্ট করলেই হবে) -->
+                <!--
                 <div class="subject-card" style="text-align: center; padding: 35px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px;">
                         <span style="font-size: 30px; line-height: 1;">🏛️</span>
@@ -65,17 +66,13 @@
                     <p style="margin-bottom: 20px; color: #475569; font-size: 14.5px;">একাদশ-দ্বাদশ শ্রেণি কুইজ টেস্ট</p>
                     <a href="{% url 'quiz_subjects' 'hsc' %}" class="btn-card-action" style="display: inline-block;">কুইজ শুরু করুন 🚀</a>
                 </div>
+                -->
             </div>
         </main>
 
         <!-- Footer Bar -->
         <footer class="footer-bar">
             <div class="footer-quote"><span>📚</span> "সহজ পাঠে তৈরি হোক সুন্দর আগামী"</div>
-        </footer>
-    </div>
-
-</body>
-</html>
         </footer>
     </div>
 
