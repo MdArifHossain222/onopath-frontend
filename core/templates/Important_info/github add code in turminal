@@ -1,3 +1,4 @@
 git add .
-git commit -m "Updated code and features"
+git commit -m "Updated code and featur"
 git push origin main
+# python import_mcq.py
