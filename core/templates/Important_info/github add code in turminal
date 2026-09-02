@@ -1,3 +1,4 @@
+& "C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" -U postgres onopath_db > database_backup.sql
 git add .
 git commit -m "Updated code and featur"
 git push origin main
